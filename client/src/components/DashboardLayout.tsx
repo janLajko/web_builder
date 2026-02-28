@@ -1,10 +1,11 @@
 import { ReactNode } from "react"
 import { useAuth } from "../providers"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import {
     Search, Zap, Bell, ChevronDown, LayoutGrid, Folder,
-    Bot, Users, CreditCard, Settings
+    Bot, Users, CreditCard, Settings, LogOut
 } from "lucide-react"
+import { authClient } from "../lib/authClient"
 
 interface DashboardLayoutProps {
     children: ReactNode
@@ -13,6 +14,17 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const { user } = useAuth()
     const location = useLocation()
+    const navigate = useNavigate()
+
+    const handleLogout = async () => {
+        await authClient.signOut({
+            fetchOptions: {
+                onSuccess: () => {
+                    navigate("/");
+                }
+            }
+        });
+    };
 
     return (
         <div className="flex h-screen bg-[#111111] text-white font-['Inter'] selection:bg-[#14F195]/30 overflow-hidden">
@@ -27,26 +39,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
 
                     <nav className="px-3 space-y-1">
-                        <Link to="/" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm ${location.pathname === '/' ? 'bg-white/5 text-white' : 'text-[#a19db3] hover:text-white hover:bg-white/5'}`}>
+                        <Link to="/" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 font-medium text-sm hover:translate-x-0.5 ${location.pathname === '/' ? 'bg-white/5 text-white' : 'text-[#a19db3] hover:text-white hover:bg-white/5'}`}>
                             {location.pathname === '/' && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#14F195] rounded-r-md"></div>}
                             <LayoutGrid className="w-5 h-5" /> Home
                         </Link>
-                        <Link to="/my-projects" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm relative ${location.pathname === '/my-projects' ? 'bg-white/5 text-white' : 'text-[#a19db3] hover:text-white hover:bg-white/5'}`}>
+                        <Link to="/my-projects" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 font-medium text-sm relative hover:translate-x-0.5 ${location.pathname === '/my-projects' ? 'bg-white/5 text-white' : 'text-[#a19db3] hover:text-white hover:bg-white/5'}`}>
                             {location.pathname === '/my-projects' && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#14F195] rounded-r-md"></div>}
                             <Folder className="w-5 h-5" /> My Projects
                         </Link>
-                        <Link to="/ai-builder" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm relative ${location.pathname === '/ai-builder' ? 'bg-white/5 text-white' : 'text-[#a19db3] hover:text-white hover:bg-white/5'}`}>
+                        <Link to="/ai-builder" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 font-medium text-sm relative hover:translate-x-0.5 ${location.pathname === '/ai-builder' ? 'bg-white/5 text-white' : 'text-[#a19db3] hover:text-white hover:bg-white/5'}`}>
                             {location.pathname === '/ai-builder' && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#14F195] rounded-r-md"></div>}
                             <Bot className="w-5 h-5" /> AI Builder
                         </Link>
-                        <Link to="#" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a19db3] hover:text-white hover:bg-white/5 transition-colors font-medium text-sm">
+                        <Link to="#" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a19db3] hover:text-white hover:bg-white/5 transition-all duration-200 font-medium text-sm hover:translate-x-0.5">
                             <Users className="w-5 h-5" /> Community
                         </Link>
-                        <Link to="/pricing" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm relative ${location.pathname === '/pricing' ? 'bg-white/5 text-white' : 'text-[#a19db3] hover:text-white hover:bg-white/5'}`}>
+                        <Link to="/pricing" className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 font-medium text-sm relative hover:translate-x-0.5 ${location.pathname === '/pricing' ? 'bg-white/5 text-white' : 'text-[#a19db3] hover:text-white hover:bg-white/5'}`}>
                             {location.pathname === '/pricing' && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#14F195] rounded-r-md"></div>}
                             <CreditCard className="w-5 h-5" /> Pricing
                         </Link>
-                        <Link to="#" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a19db3] hover:text-white hover:bg-white/5 transition-colors font-medium text-sm">
+                        <Link to="#" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#a19db3] hover:text-white hover:bg-white/5 transition-all duration-200 font-medium text-sm hover:translate-x-0.5">
                             <Settings className="w-5 h-5" /> Settings
                         </Link>
                     </nav>
@@ -73,7 +85,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             <input
                                 type="text"
                                 placeholder="Search projects..."
-                                className="w-full bg-[#1A1A1A]/60 border border-white/5 rounded-full py-2.5 pl-11 pr-4 text-sm text-white placeholder:text-[#a19db3] focus:outline-none focus:border-[#14F195]/50 focus:bg-[#1A1A1A] transition-colors"
+                                className="w-full bg-[#1A1A1A]/60 border border-white/5 rounded-full py-2.5 pl-11 pr-4 text-sm text-white placeholder:text-[#a19db3] focus:outline-none focus:border-[#14F195]/50 focus:bg-[#1A1A1A] focus:shadow-[0_0_15px_rgba(20,241,149,0.1)] transition-all duration-300"
                             />
                         </div>
                     </div>
@@ -89,22 +101,45 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         </button>
 
                         <div className="flex items-center gap-3 cursor-pointer group">
-                            <div className="text-right hidden sm:block">
-                                <div className="text-sm font-bold text-white group-hover:text-[#14F195] transition-colors">{user?.name || "Alex Rivera"}</div>
-                                <div className="text-xs text-[#a19db3]">Founder</div>
-                            </div>
-                            <div className="w-10 h-10 rounded-full border-2 border-[#1A1A1A] bg-[#1A1A1A] flex items-center justify-center relative overflow-hidden group-hover:border-[#14F195]/50 transition-colors">
-                                <span className="text-sm font-bold text-[#14F195]">{user?.name ? user.name.substring(0, 2).toUpperCase() : 'AR'}</span>
-                                <div className="absolute inset-0 border border-white/10 rounded-full"></div>
-                                {/* Decorative rings */}
-                                <div className="absolute -inset-1 border border-[#14F195]/30 rounded-full animate-[spin_4s_linear_infinite]"></div>
-                            </div>
-                            <ChevronDown className="w-4 h-4 text-[#a19db3]" />
+                            {user ? (
+                                <>
+                                    <div className="text-right hidden sm:block">
+                                        <div className="text-sm font-bold text-white group-hover:text-[#14F195] transition-colors">{user.name || "Alex Rivera"}</div>
+                                        <div className="text-xs text-[#a19db3]">Founder</div>
+                                    </div>
+                                    <div className="w-10 h-10 rounded-full border-2 border-[#1A1A1A] bg-[#1A1A1A] flex items-center justify-center relative overflow-hidden group-hover:border-[#14F195]/50 transition-colors">
+                                        <span className="text-sm font-bold text-[#14F195]">{user.name ? user.name.substring(0, 2).toUpperCase() : 'AR'}</span>
+                                        <div className="absolute inset-0 border border-white/10 rounded-full"></div>
+                                        {/* Decorative rings */}
+                                        <div className="absolute -inset-1 border border-[#14F195]/30 rounded-full animate-[spin_4s_linear_infinite]"></div>
+                                    </div>
+                                    <ChevronDown className="w-4 h-4 text-[#a19db3]" />
+                                    <button
+                                        onClick={handleLogout}
+                                        className="ml-2 p-2 rounded-lg text-red-500/70 hover:bg-red-500/10 hover:text-red-500 transition-colors"
+                                        title="Log Out"
+                                    >
+                                        <LogOut className="w-4 h-4" />
+                                    </button>
+                                </>
+                            ) : (
+                                <Link to="/auth" className="px-5 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-white transition-colors">
+                                    Sign In
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto p-8 no-scrollbar bg-[url('/noise.png')] bg-repeat bg-[length:100px_100px]" style={{ backgroundBlendMode: 'overlay', backgroundColor: 'rgba(17,17,17,0.98)' }}>
+                <div
+                    className="flex-1 overflow-y-auto p-8 no-scrollbar"
+                    style={{
+                        backgroundColor: 'rgba(17,17,17,0.98)',
+                        backgroundBlendMode: 'overlay',
+                        backgroundImage: 'radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px)',
+                        backgroundSize: '4px 4px'
+                    }}
+                >
                     <div className="max-w-[1400px] mx-auto h-full flex flex-col">
                         {children}
                     </div>

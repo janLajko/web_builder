@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { useLocation } from "react-router-dom"
+import { useLocation, useParams } from "react-router-dom"
 import { Sidebar } from "../components/Sidebar"
 import { ProjectPreview } from "../components/ProjectPreview"
 import { api } from "../config/axios"
@@ -8,6 +8,7 @@ import { Sparkles, Code2, Monitor, Smartphone, Tablet, Download, Save, Eye, Scan
 
 export default function Projects() {
     const location = useLocation()
+    const { id } = useParams()
     const initialPrompt = location.state?.initialPrompt || ""
 
     const [project, setProject] = useState<WebsiteProject | null>(null)
@@ -15,13 +16,35 @@ export default function Projects() {
     const [step, setStep] = useState(0)
     const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
     const previewRef = useRef<{ getCode: () => string }>(null)
+    const generationTriggeredRef = useRef(false)
 
-    // Demo loading effect and actual API call
+    // Load an existing project when opened from /projects/:id
     useEffect(() => {
-        if (initialPrompt && !project && !loading) {
+        const fetchProjectById = async (projectId: string) => {
+            try {
+                setLoading(true)
+                const fullRes = await api.get(`/api/project/${projectId}`)
+                setProject(fullRes.data)
+            } catch (error) {
+                console.error("Failed to load project:", error)
+                alert("Failed to load this project.")
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        if (id) {
+            fetchProjectById(id)
+        }
+    }, [id])
+
+    // Start fresh generation when coming from flows that pass initialPrompt state
+    useEffect(() => {
+        if (!id && initialPrompt && !generationTriggeredRef.current && !project && !loading) {
+            generationTriggeredRef.current = true
             handleInitialGeneration(initialPrompt)
         }
-    }, [initialPrompt])
+    }, [id, initialPrompt, project, loading])
 
     const handleInitialGeneration = async (prompt: string) => {
         setLoading(true)

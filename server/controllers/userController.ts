@@ -5,6 +5,67 @@ import openai from "../configs/openai.js";
 
 dotenv.config();
 
+// List of models to try in order — if the first fails (rate limit/timeout), try the next
+const MODELS = [
+    "z-ai/glm-4.5-air:free",
+    "deepseek/deepseek-chat-v3-0324:free",
+    "google/gemini-2.0-flash-exp:free",
+    "meta-llama/llama-4-maverick:free"
+];
+
+const TIMEOUT_MS = 60000; // 60 seconds per model attempt
+
+async function callAIWithFallback(messages: Array<{ role: string; content: string }>): Promise<string> {
+    let lastError: any = null;
+
+    for (const model of MODELS) {
+        try {
+            console.log(`[AI] Trying model: ${model}`);
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+            const completion = await openai.chat.completions.create(
+                {
+                    model,
+                    messages: messages as any,
+                },
+                { signal: controller.signal as any }
+            );
+
+            clearTimeout(timeout);
+
+            const content = completion.choices?.[0]?.message?.content || "";
+            if (!content.trim()) {
+                console.log(`[AI] Model ${model} returned empty response, trying next...`);
+                continue;
+            }
+
+            console.log(`[AI] Success with model: ${model} (${content.length} chars)`);
+            return content;
+        } catch (error: any) {
+            lastError = error;
+            const status = error?.status || error?.response?.status;
+            const msg = error?.message || "Unknown error";
+            console.error(`[AI] Model ${model} failed: ${status || "N/A"} - ${msg}`);
+
+            if (error.name === "AbortError" || msg.includes("aborted")) {
+                console.error(`[AI] Model ${model} timed out after ${TIMEOUT_MS / 1000}s`);
+            }
+
+            // Rate limit (429) or server error (5xx) or timeout — try next model
+            if (status === 429 || status >= 500 || error.name === "AbortError") {
+                continue;
+            }
+
+            // For other errors (auth, bad request), don't retry
+            throw error;
+        }
+    }
+
+    throw lastError || new Error("All AI models failed");
+}
+
 export const getUserCredits = async (req: Request, res: Response) => {
     try {
         const user = await prisma.user.findUnique({ where: { id: req.userId } });
@@ -19,16 +80,25 @@ export const createProject = async (req: Request, res: Response) => {
     const userId = req.userId as string;
     try {
         const { initialPrompt } = req.body;
+        if (typeof initialPrompt !== "string" || !initialPrompt.trim()) {
+            return res.status(400).json({ message: "initialPrompt is required" });
+        }
+
+        const normalizedPrompt = initialPrompt.trim();
         const user = await prisma.user.findUnique({ where: { id: userId } });
 
-        if (user && user.credits < 5) {
-            return res.status(403).json({ message: "Add credit to create more projects" });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (user.credits < 5) {
+            return res.status(403).json({ message: "Add credits to create more projects" });
         }
 
         const project = await prisma.websiteProject.create({
             data: {
-                name: initialPrompt.length > 50 ? initialPrompt.substring(0, 47) + "..." : initialPrompt,
-                initialPrompt: initialPrompt,
+                name: normalizedPrompt.length > 50 ? normalizedPrompt.substring(0, 47) + "..." : normalizedPrompt,
+                initialPrompt: normalizedPrompt,
                 userId: userId
             }
         });
@@ -42,15 +112,18 @@ export const createProject = async (req: Request, res: Response) => {
         });
 
         await prisma.conversation.create({
-            data: { role: "user", content: initialPrompt, projectId: project.id }
+            data: { role: "user", content: normalizedPrompt, projectId: project.id }
         });
 
+        // Send response immediately so client can start polling
         res.json({ projectId: project.id });
 
-        // Enhance user prompt
-        const promptEnhancedResponse = await openai.chat.completions.create({
-            model: "z-ai/glm-4.5-air:free",
-            messages: [
+        console.log(`[CreateProject] Starting generation for project ${project.id} (user: ${userId})`);
+
+        // Step 1: Enhance the prompt (with fallback)
+        let enhancedPrompt: string;
+        try {
+            enhancedPrompt = await callAIWithFallback([
                 {
                     role: "system",
                     content: `You are a prompt enhancement specialist. Take the user's website request and expand it into a detailed, comprehensive prompt that will help create the best possible website.
@@ -66,29 +139,26 @@ export const createProject = async (req: Request, res: Response) => {
                 },
                 {
                     role: "user",
-                    content: initialPrompt
+                    content: normalizedPrompt
                 }
-            ]
-        });
+            ]);
+            console.log(`[CreateProject] Prompt enhanced successfully (${enhancedPrompt.length} chars)`);
+        } catch (error: any) {
+            console.error("[CreateProject] Prompt enhancement failed, using original:", error?.message);
+            enhancedPrompt = normalizedPrompt; // Fall back to original prompt
+        }
 
-        const enhancedPrompt = promptEnhancedResponse.choices[0].message.content;
-
-        // Generates the actual website code
-        const codeGenerationResponse = await openai.chat.completions.create({
-            model: "z-ai/glm-4.5-air:free",
-            messages: [
-                {
-                    role: "system",
-                    content: `You are an expert react/tailwind developer. Generate raw HTML with tailwind classes for the next request. Only output html code. Use inline styles sparingly.`
-                },
-                {
-                    role: "user",
-                    content: enhancedPrompt || ""
-                }
-            ]
-        });
-
-        const code = codeGenerationResponse.choices[0].message.content || "";
+        // Step 2: Generate the actual website code (with fallback)
+        const code = await callAIWithFallback([
+            {
+                role: "system",
+                content: `You are an expert react/tailwind developer. Generate raw HTML with tailwind classes for the next request. Only output html code. Use inline styles sparingly.`
+            },
+            {
+                role: "user",
+                content: enhancedPrompt
+            }
+        ]);
 
         if (!code) {
             await prisma.conversation.create({ data: { role: "assistant", content: "Unable to generate code. Please try again.", projectId: project.id } });
@@ -96,25 +166,37 @@ export const createProject = async (req: Request, res: Response) => {
             return;
         }
 
+        const cleanedCode = code.replace(/```html/gi, "").replace(/```/g, "").trim();
+
         const version = await prisma.version.create({
             data: {
-                code: code.replace(/```html/gi, "").replace(/```/g, "").trim(),
+                code: cleanedCode,
                 projectId: project.id
             }
         });
 
         await prisma.websiteProject.update({
             where: { id: project.id },
-            data: { currentCode: code, currentVersionIndex: version.id }
+            data: { currentCode: cleanedCode, currentVersionIndex: version.id }
         });
 
+        console.log(`[CreateProject] Generation complete for project ${project.id}`);
+
     } catch (error: any) {
+        console.error("[CreateProject] Error:", error?.message || error);
         // Refund credits on failure
-        await prisma.user.update({
-            where: { id: userId },
-            data: { credits: { increment: 5 } }
-        });
-        res.status(500).json({ message: error.message });
+        try {
+            await prisma.user.update({
+                where: { id: userId },
+                data: { credits: { increment: 5 } }
+            });
+        } catch (refundError) {
+            console.error("[CreateProject] Failed to refund credits:", refundError);
+        }
+        // Only send error response if headers haven't been sent yet
+        if (!res.headersSent) {
+            res.status(500).json({ message: error.message || "Generation failed" });
+        }
     }
 };
 
@@ -133,7 +215,7 @@ export const getUserProjects = async (req: Request, res: Response) => {
 export const getSingleProject = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const project = await prisma.websiteProject.findUnique({
+        const project = await prisma.websiteProject.findFirst({
             where: { id, userId: req.userId },
             include: { versions: { orderBy: { createdAt: 'desc' } } }
         });
@@ -147,7 +229,7 @@ export const getSingleProject = async (req: Request, res: Response) => {
 export const togglePublish = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const project = await prisma.websiteProject.findUnique({ where: { id, userId: req.userId } });
+        const project = await prisma.websiteProject.findFirst({ where: { id, userId: req.userId } });
         if (!project) return res.status(404).json({ message: "Project not found" });
 
         const updated = await prisma.websiteProject.update({

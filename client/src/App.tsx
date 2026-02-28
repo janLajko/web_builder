@@ -13,6 +13,8 @@ import Templates from './pages/Templates'
 import OnboardingComplete from './pages/OnboardingComplete'
 import AIBuilder from './pages/AIBuilder'
 import Privacy from './pages/Privacy'
+import AboutUs from './pages/AboutUs'
+import Documentation from './pages/Documentation'
 import LenisProvider from './providers/LenisProvider'
 
 function App() {
@@ -24,12 +26,15 @@ function App() {
                 <Route path="/templates" element={<Templates />} />
                 <Route path="/onboarding-complete" element={<OnboardingComplete />} />
                 <Route path="/projects" element={<Projects />} />
+                <Route path="/projects/:id" element={<Projects />} />
                 <Route path="/my-projects" element={<MyProjects />} />
                 <Route path="/ai-builder" element={<AIBuilder />} />
                 <Route path="/community" element={<Community />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/about-us" element={<AboutUs />} />
+                <Route path="/docs" element={<Documentation />} />
                 <Route path="/preview/:id" element={<Preview />} />
                 <Route path="/view/:id" element={<View />} />
                 <Route path="/loading" element={<Loading />} />
