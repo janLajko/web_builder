@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { Wand2, Play, Layers, Settings, Menu, X, Star, Users, Zap, Database, Repeat } from "lucide-react"
+import { Wand2, Play, Layers, Settings, Menu, X, Star, Users, Zap, Database, Repeat, Quote } from "lucide-react"
 import { useSession, authClient } from "../lib/authClient"
 import { useTheme } from "../providers/ThemeProvider"
 import toast from "react-hot-toast"
@@ -9,6 +9,57 @@ export default function Home() {
     const [input, setInput] = useState('')
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [showSettings, setShowSettings] = useState(false)
+    const [activeTestimonial, setActiveTestimonial] = useState(0)
+    const [testimonialFading, setTestimonialFading] = useState(false)
+
+    const testimonials = [
+        {
+            name: "Divyesh Soni",
+            role: "Frontend Developer",
+            quote: "DivStack AI Frontend made by me and Mr Vivek yadav .",
+            rating: 5,
+            color: "bg-blue-500"
+        },
+        {
+            name: "vivek yadav",
+            role: "Frontend Developer",
+            quote: "half of this frontend made by me and Mr Soni Divyesh.",
+            rating: 5,
+            color: "bg-purple-500"
+        },
+        {
+            name: "SAchin Kharat",
+            role: "Backend Developer",
+            quote: "I build this half backend server and half build by yash rathod.",
+            rating: 5,
+            color: "bg-teal-500"
+        },
+        {
+            name: "Yash Rathod",
+            role: "Backend Developer",
+            quote: "i build the backend with the help of sachin kharat.",
+            rating: 5,
+            color: "bg-indigo-500"
+        },
+        {
+            name: "Dhaval Joshi",
+            role: "Database and APi testing",
+            quote: "I made the database of this website plus tested API which are used in this website.",
+            rating: 5,
+            color: "bg-pink-500"
+        }
+    ]
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTestimonialFading(true)
+            setTimeout(() => {
+                setActiveTestimonial(prev => (prev + 1) % testimonials.length)
+                setTestimonialFading(false)
+            }, 600)
+        }, 5000)
+        return () => clearInterval(interval)
+    }, [testimonials.length])
 
     const { theme, setTheme } = useTheme()
 
@@ -444,6 +495,70 @@ export default function Home() {
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-4">Community Hub</h3>
                             <p className="text-gray-500 text-sm leading-relaxed font-medium">Share templates, prompt recipes, and get inspired by a global community of modern web developers.</p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Testimonials Section */}
+                <section className="w-full max-w-[1200px] mx-auto px-6 py-24 bg-white">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 mb-6 uppercase">What People<br />Are Saying</h2>
+                        <p className="text-gray-500 text-lg font-medium max-w-xl mx-auto">Join thousands of developers and designers who build with DivStack AI every day.</p>
+                    </div>
+
+                    <div className="relative min-h-[320px] flex items-center justify-center">
+                        {/* Background decorative elements */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-100/40 rounded-full blur-[80px] pointer-events-none"></div>
+
+                        {/* Testimonial Card */}
+                        <div
+                            key={activeTestimonial}
+                            className={`w-full max-w-2xl mx-auto ${testimonialFading ? 'testimonial-fade-out' : 'testimonial-fade-in'}`}
+                        >
+                            <div className="bg-[#F8FAFC] rounded-[2.5rem] p-10 md:p-12 border border-[#EAF2F8] shadow-sm relative">
+                                {/* Quote Icon */}
+                                <div className="absolute -top-5 left-10">
+                                    <div className="w-10 h-10 bg-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                        <Quote className="w-5 h-5 text-white fill-white" />
+                                    </div>
+                                </div>
+
+                                {/* Stars */}
+                                <div className="flex items-center gap-1 mb-6 mt-2">
+                                    {Array.from({ length: testimonials[activeTestimonial].rating }).map((_, i) => (
+                                        <Star key={i} className="w-4 h-4 fill-[#F59E0B] text-[#F59E0B]" />
+                                    ))}
+                                </div>
+
+                                {/* Quote Text */}
+                                <p className="text-gray-700 text-lg md:text-xl leading-relaxed font-medium mb-8">
+                                    "{testimonials[activeTestimonial].quote}"
+                                </p>
+
+                                {/* Author */}
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-12 h-12 ${testimonials[activeTestimonial].color} rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md`}>
+                                        {testimonials[activeTestimonial].name.split(' ').map(n => n[0]).join('')}
+                                    </div>
+                                    <div>
+                                        <div className="font-bold text-gray-900 text-sm">{testimonials[activeTestimonial].name}</div>
+                                        <div className="text-gray-500 text-xs font-medium">{testimonials[activeTestimonial].role}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Dot Indicators */}
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                            {testimonials.map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`h-2 rounded-full transition-all duration-500 ${i === activeTestimonial
+                                        ? 'w-8 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]'
+                                        : 'w-2 bg-gray-300'
+                                        }`}
+                                />
+                            ))}
                         </div>
                     </div>
                 </section>
