@@ -10,12 +10,16 @@ module.exports = {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
-                background: "#111111",
+                background: "#050505",
                 foreground: "#F5F5F5",
-                surface: "#1A1A1A",
+                surface: "#0A0A0A",
+                cardSurface: "#0D1117",
                 text: "#F5F5F5",
-                primaryStart: "#14F195",
-                primaryEnd: "#00C2A8",
+                neonGreen: "#00E87B",
+                neonGreenLight: "#34D399",
+                neonGreenDim: "#059669",
+                accentAmber: "#F59E0B",
+                mutedText: "#9CA3AF",
                 primary: {
                     DEFAULT: "hsl(var(--primary))",
                     foreground: "hsl(var(--primary-foreground))",
@@ -58,11 +62,70 @@ module.exports = {
                 scrollRight: {
                     '0%': { transform: 'translateX(-50%)' },
                     '100%': { transform: 'translateX(0)' },
-                }
+                },
+                slideUp: {
+                    '0%': { opacity: '0', transform: 'translateY(30px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                scaleIn: {
+                    '0%': { opacity: '0', transform: 'scale(0.92)' },
+                    '100%': { opacity: '1', transform: 'scale(1)' },
+                },
+                shimmer: {
+                    '0%': { backgroundPosition: '200% 0' },
+                    '100%': { backgroundPosition: '-200% 0' },
+                },
+                glowPulse: {
+                    '0%, 100%': { boxShadow: '0 0 8px rgba(0,232,123,0.2)' },
+                    '50%': { boxShadow: '0 0 20px rgba(0,232,123,0.5)' },
+                },
+                wiggle: {
+                    '0%, 100%': { transform: 'rotate(-1deg)' },
+                    '50%': { transform: 'rotate(1deg)' },
+                },
+                fadeIn: {
+                    '0%': { opacity: '0' },
+                    '100%': { opacity: '1' },
+                },
+                gradientShift: {
+                    '0%': { backgroundPosition: '0% 50%' },
+                    '50%': { backgroundPosition: '100% 50%' },
+                    '100%': { backgroundPosition: '0% 50%' },
+                },
+                ripple: {
+                    '0%': { transform: 'scale(0)', opacity: '0.5' },
+                    '100%': { transform: 'scale(4)', opacity: '0' },
+                },
+                counterPulse: {
+                    '0%': { transform: 'scale(1)' },
+                    '50%': { transform: 'scale(1.15)' },
+                    '100%': { transform: 'scale(1)' },
+                },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0px)' },
+                    '50%': { transform: 'translateY(-12px)' },
+                },
+                aurora: {
+                    '0%': { transform: 'rotate(0deg) scale(1)', opacity: '0.3' },
+                    '33%': { transform: 'rotate(5deg) scale(1.1)', opacity: '0.5' },
+                    '66%': { transform: 'rotate(-3deg) scale(0.95)', opacity: '0.35' },
+                    '100%': { transform: 'rotate(0deg) scale(1)', opacity: '0.3' },
+                },
             },
             animation: {
                 'scroll-left': 'scrollLeft 30s linear infinite',
                 'scroll-right': 'scrollRight 30s linear infinite',
+                'slide-up': 'slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both',
+                'scale-in': 'scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both',
+                'shimmer': 'shimmer 2.5s ease-in-out infinite',
+                'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+                'wiggle': 'wiggle 0.3s ease-in-out',
+                'fade-in': 'fadeIn 0.8s ease-out both',
+                'gradient-shift': 'gradientShift 3s ease infinite',
+                'ripple': 'ripple 0.6s linear',
+                'counter-pulse': 'counterPulse 0.3s ease-out',
+                'float': 'float 6s ease-in-out infinite',
+                'aurora': 'aurora 8s ease-in-out infinite',
             }
         }
     },

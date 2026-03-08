@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import openai from "../configs/openai.js";
+import { deepseekClient } from "../configs/openai.js";
 
 const SYSTEM_PROMPT = "You are an expert web developer AI. Output ONLY clean HTML with embedded Tailwind CSS and inline javascript if necessary. Do not wrap in markdown tags.";
 
-// List of models to try in order — if the first fails (rate limit/timeout), try the next
+// List of models to try in order — if the first fails (rate limit/timeout), try thenext
 const MODELS = [
-    "z-ai/glm-4.5-air:free",
-    "deepseek/deepseek-chat-v3-0324:free",
-    "google/gemini-2.0-flash-exp:free",
-    "meta-llama/llama-4-maverick:free"
+    "meta/llama-3.1-70b-instruct",
+    "deepseek-ai/deepseek-v3.2",
+    "meta/llama-3.1-405b-instruct"
 ];
 
-const TIMEOUT_MS = 60000; // 60 seconds timeout
+const TIMEOUT_MS = 600000; // 10 minutes timeout
 
 async function callAIWithFallback(messages: Array<{ role: string; content: string }>): Promise<string> {
     let lastError: any = null;
@@ -21,13 +21,19 @@ async function callAIWithFallback(messages: Array<{ role: string; content: strin
         try {
             console.log(`[AI] Trying model: ${model}`);
 
+            // Pick the right client based on model
+            const client = model.includes('deepseek') ? deepseekClient : openai;
+
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-            const completion = await openai.chat.completions.create(
+            const completion = await client.chat.completions.create(
                 {
                     model,
                     messages: messages as any,
+                    temperature: 0.2,
+                    top_p: 0.7,
+                    max_tokens: 8192,
                 },
                 { signal: controller.signal as any }
             );

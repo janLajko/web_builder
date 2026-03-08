@@ -20,8 +20,8 @@ export default function View() {
         fetchCode()
     }, [id])
 
-    if (error) return <div className="h-screen flex items-center justify-center text-destructive bg-background text-lg">{error}</div>
-    if (!code) return <div className="h-screen flex items-center justify-center bg-background"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>
+    if (error) return <div className="h-screen flex items-center justify-center text-red-400 bg-[#050505] text-lg">{error}</div>
+    if (!code) return <div className="h-screen flex items-center justify-center bg-[#050505]"><Loader2 className="animate-spin w-8 h-8 text-[#00E87B]" /></div>
 
     return (
         <iframe title="View" srcDoc={code} className="w-full h-screen border-none bg-white block" sandbox="allow-scripts" />

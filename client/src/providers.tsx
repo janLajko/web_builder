@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { authClient } from './lib/authClient'
 import type { User } from './types'
+import { ThemeProvider } from './providers/ThemeProvider'
 
 interface AuthContextType {
     user: User | null;
@@ -37,8 +38,10 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
     }, [])
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, checkAuth }}>
-            {children}
-        </AuthContext.Provider>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <AuthContext.Provider value={{ user, isLoading, checkAuth }}>
+                {children}
+            </AuthContext.Provider>
+        </ThemeProvider>
     )
 }

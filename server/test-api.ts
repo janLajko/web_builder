@@ -4,29 +4,28 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const openai = new OpenAI({
-    baseURL: "https://openrouter.ai/api/v1",
     apiKey: process.env.AI_API_KEY,
-    defaultHeaders: {
-        "HTTP-Referer": process.env.TRUSTED_ORIGINS || "http://localhost:5173",
-        "X-Title": "DivStack AI",
-    },
+    baseURL: 'https://integrate.api.nvidia.com/v1',
 });
 
 async function testConnection() {
     try {
-        console.log("Testing OpenRouter API key...");
+        console.log("Testing NVIDIA API key...");
         const completion = await openai.chat.completions.create({
-            model: "z-ai/glm-4.5-air:free",
+            model: "deepseek-ai/deepseek-v3.2",
             messages: [
                 { role: "user", content: "Say 'API Key is working!'" }
-            ]
+            ],
+            temperature: 1,
+            top_p: 0.95,
+            max_tokens: 8192,
         });
 
         console.log("Success! Response from model:");
         console.log(completion.choices[0].message.content);
         console.log("\nAPI Key is valid and connected to backend properly.");
     } catch (error: any) {
-        console.error("Failed to connect to OpenRouter API:");
+        console.error("Failed to connect to NVIDIA API:");
         if (error.response) {
             console.error("Status:", error.response.status);
             console.error("Data:", error.response.data);

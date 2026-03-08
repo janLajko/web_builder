@@ -1,32 +1,19 @@
-import { Loader2, CheckCircle2 } from "lucide-react"
+interface LoaderStepsProps {
+    step: number;
+    steps?: string[]
+}
 
-export const LoaderSteps = ({ step }: { step: number }) => {
-    const steps = [
-        "Analyzing prompt...",
-        "Planning layout architecture...",
-        "Writing Tailwind CSS styling...",
-        "Finalizing code...",
-    ]
-
+export const LoaderSteps = ({ step, steps = ["Analyzing requirements...", "Architecting components...", "Generating responsive code..."] }: LoaderStepsProps) => {
     return (
-        <div className="space-y-5 w-full max-w-sm mx-auto p-8 rounded-xl glass border border-primary/20 shadow-[0_0_30px_rgba(20,241,149,0.15)] relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primaryStart to-primaryEnd animate-[pulse_2s_ease-in-out_infinite]"></div>
-            {steps.map((s, i) => {
-                const isActive = i === step
-                const isCompleted = i < step
-                return (
-                    <div key={i} className={`flex items-center gap-4 text-sm transition-all duration-300 ${isActive ? 'text-primary scale-105 font-medium bg-primary/5 -ml-2 p-2 rounded-lg' : isCompleted ? 'text-muted-foreground' : 'text-muted-foreground/30'}`}>
-                        {isCompleted ? (
-                            <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                        ) : isActive ? (
-                            <Loader2 className="w-5 h-5 animate-spin shrink-0" />
-                        ) : (
-                            <div className="w-5 h-5 rounded-full border-2 border-current opacity-30 shrink-0"></div>
-                        )}
-                        <span>{s}</span>
+        <div className="glass-card p-6 space-y-4 animate-slide-up">
+            {steps.map((text, idx) => (
+                <div key={idx} className={`flex items-center gap-3 text-sm ${idx <= step ? 'opacity-100' : 'opacity-30'}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${idx < step ? 'bg-[#00E87B] text-black' : idx === step ? 'border-2 border-[#00E87B] text-[#00E87B] animate-pulse' : 'border border-white/20 text-[#9CA3AF]'}`}>
+                        {idx < step ? '✓' : idx + 1}
                     </div>
-                )
-            })}
+                    <span className={idx === step ? 'text-[#00E87B] font-medium' : 'text-[#9CA3AF]'}>{text}</span>
+                </div>
+            ))}
         </div>
     )
 }

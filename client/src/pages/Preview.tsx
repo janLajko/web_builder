@@ -20,12 +20,12 @@ export default function Preview() {
         fetchCode()
     }, [id])
 
-    if (!code) return <div className="h-screen flex items-center justify-center bg-background"><Loader2 className="animate-spin text-primary" /></div>
+    if (!code) return <div className="h-screen flex items-center justify-center bg-[#050505]"><Loader2 className="animate-spin text-[#00E87B]" /></div>
 
     return (
-        <div className="h-screen flex flex-col bg-background">
-            <div className="h-14 bg-card border-b border-border flex items-center px-4">
-                <button onClick={() => navigate(-1)} className="text-sm flex items-center gap-2 hover:bg-secondary px-3 py-1.5 rounded-md transition-colors text-foreground">
+        <div className="h-screen flex flex-col bg-[#050505]">
+            <div className="h-14 bg-[#0A0A0A] border-b border-white/5 flex items-center px-4">
+                <button onClick={() => navigate(-1)} className="text-sm flex items-center gap-2 hover:bg-white/5 px-3 py-1.5 rounded-md transition-colors text-white">
                     <ArrowLeft className="w-4 h-4" /> Back to Project
                 </button>
             </div>

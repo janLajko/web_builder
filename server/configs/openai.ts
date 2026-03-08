@@ -3,13 +3,16 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// Primary client (for Llama models) using AI_API_KEY
 const openai = new OpenAI({
-    baseURL: "https://openrouter.ai/api/v1",
     apiKey: process.env.AI_API_KEY,
-    defaultHeaders: {
-        "HTTP-Referer": process.env.TRUSTED_ORIGINS || "http://localhost:5173", // Optional. Site URL for rankings on openrouter.ai.
-        "X-Title": "DivStack AI", // Optional. Site title for rankings on openrouter.ai.
-    },
+    baseURL: 'https://integrate.api.nvidia.com/v1',
+});
+
+// Secondary client (for DeepSeek models) using DEEPSEEK_API_KEY
+export const deepseekClient = new OpenAI({
+    apiKey: process.env.DEEPSEEK_API_KEY,
+    baseURL: 'https://integrate.api.nvidia.com/v1',
 });
 
 export default openai;

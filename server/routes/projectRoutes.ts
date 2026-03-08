@@ -4,6 +4,7 @@ import {
     reviseWebsite,
     rollbackVersion,
     deleteProject,
+    renameProject,
     getPublicProjects,
     getPreviewCode,
     saveManualUpdate
@@ -32,5 +33,6 @@ router.post("/revise", reviseWebsite);
 router.post("/save", saveManualUpdate);
 router.get("/rollback/:versionId", rollbackVersion);
 router.delete("/delete/:id", deleteProject);
+router.patch("/rename/:id", renameProject);
 
 export default router;
