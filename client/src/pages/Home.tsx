@@ -209,30 +209,30 @@ export default function Home() {
                     </div>
 
                     {/* Abstract App Graphic Card */}
-                    <div className="bg-white rounded-[2rem] p-5 shadow-sm border border-[#EAF2F8] group relative overflow-hidden flex-1 min-h-[140px] flex items-center justify-center">
-                        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white opacity-50"></div>
+                    <div className="bg-white dark:bg-[#1A1A1A] rounded-[2rem] p-5 shadow-sm border border-[#EAF2F8] dark:border-white/5 group relative overflow-hidden flex-1 min-h-[140px] flex items-center justify-center transition-colors duration-500">
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-[#1A1A1A] opacity-50"></div>
                         {/* Abstract Wireframe Graphic */}
                         <div className="relative z-10 w-full h-full flex flex-col gap-2 opacity-80 group-hover:scale-105 transition-transform duration-500">
-                            <div className="w-full h-1/2 bg-gray-100 rounded-xl flex items-center justify-center">
-                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center"><Layers className="w-4 h-4 text-blue-500" /></div>
+                            <div className="w-full h-1/2 bg-gray-100 dark:bg-white/5 rounded-xl flex items-center justify-center transition-colors">
+                                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center transition-colors"><Layers className="w-4 h-4 text-blue-500" /></div>
                             </div>
                             <div className="flex gap-2 h-1/2">
-                                <div className="flex-1 bg-gray-50 rounded-xl border border-dashed border-gray-200"></div>
-                                <div className="flex-1 bg-gray-50 rounded-xl border border-dashed border-gray-200"></div>
+                                <div className="flex-1 bg-gray-50 dark:bg-white/5 rounded-xl border border-dashed border-gray-200 dark:border-white/10 transition-colors"></div>
+                                <div className="flex-1 bg-gray-50 dark:bg-white/5 rounded-xl border border-dashed border-gray-200 dark:border-white/10 transition-colors"></div>
                             </div>
                         </div>
                     </div>
 
                     {/* Interactive Prompt Builder Card */}
-                    <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-[#EAF2F8] relative">
-                        <h3 className="text-xl font-black text-gray-900 leading-[1.1] mb-2 tracking-tight uppercase">Describe Your<br />Vision</h3>
+                    <div className="bg-white dark:bg-[#1A1A1A] rounded-[2.5rem] p-6 shadow-sm border border-[#EAF2F8] dark:border-white/5 relative transition-colors duration-500">
+                        <h3 className="text-xl font-black text-gray-900 dark:text-white leading-[1.1] mb-2 tracking-tight uppercase transition-colors">Describe Your<br />Vision</h3>
 
                         <form onSubmit={handleSubmit} className="mt-4">
                             <textarea
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 placeholder="A modern portfolio for a freelance designer..."
-                                className="w-full h-20 bg-gray-50 border border-gray-100 rounded-2xl p-3 text-xs text-gray-700 resize-none focus:outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all font-medium placeholder:text-gray-400"
+                                className="w-full h-20 bg-gray-50 dark:bg-[#111] border border-gray-100 dark:border-white/10 rounded-2xl p-3 text-xs text-gray-700 dark:text-gray-300 resize-none focus:outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all font-medium placeholder:text-gray-400 dark:placeholder:text-gray-600"
                             />
                             <div className="flex justify-end mt-3">
                                 <button type="submit" className="w-10 h-10 rounded-full bg-[#3B82F6] flex items-center justify-center text-white cursor-pointer hover:scale-110 transition-transform shadow-[0_0_15px_rgba(59,130,246,0.4)]">
@@ -450,72 +450,72 @@ export default function Home() {
             {/*  RESTORED SECTIONS (Styled to match Light Theme) */}
             {/*  =============================================  */}
 
-            <div className="w-full bg-white flex flex-col items-center pb-24">
+            <div className="w-full bg-white dark:bg-[#0A0A0B] flex flex-col items-center pb-24 transition-colors duration-500">
 
                 {/* Trusted By Section */}
-                <section className="w-full py-16 border-b border-gray-100 bg-white">
+                <section className="w-full py-16 border-b border-gray-100 dark:border-white/5 bg-white dark:bg-[#0A0A0B] transition-colors duration-500">
                     <div className="container mx-auto px-6 text-center">
                         <div className="flex items-center justify-center gap-2 mb-4">
                             {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-4 h-4 fill-[#F59E0B] text-[#F59E0B]" />)}
                         </div>
-                        <p className="text-gray-500 text-sm mb-10 font-bold uppercase tracking-widest">Trusted by leading teams</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-10 font-bold uppercase tracking-widest transition-colors">Trusted by leading teams</p>
                         <div className="flex items-center justify-center gap-12 flex-wrap opacity-60">
                             {["JOBSAGE", "ioasis", "VIRTUO", "Altura", "Stratifi", "Luminary"].map(name => (
-                                <span key={name} className="text-xl font-black tracking-wider text-gray-400 uppercase">{name}</span>
+                                <span key={name} className="text-xl font-black tracking-wider text-gray-400 dark:text-gray-500 uppercase transition-colors">{name}</span>
                             ))}
                         </div>
                     </div>
                 </section>
 
                 {/* Features Section */}
-                <section className="w-full max-w-[1200px] mx-auto px-6 py-24 bg-white">
+                <section className="w-full max-w-[1200px] mx-auto px-6 py-24 bg-white dark:bg-[#0A0A0B] transition-colors duration-500">
                     <div className="text-center mb-20">
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 mb-6 uppercase">What You Can Build<br />Instantly</h2>
-                        <p className="text-gray-500 text-lg font-medium max-w-xl mx-auto">No coding, no drag-and-drop complexity. Describe your idea, and AI turns it into a fully functional app or website.</p>
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-6 uppercase transition-colors">What You Can Build<br />Instantly</h2>
+                        <p className="text-gray-500 dark:text-gray-400 text-lg font-medium max-w-xl mx-auto transition-colors">No coding, no drag-and-drop complexity. Describe your idea, and AI turns it into a fully functional app or website.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="bg-[#F8FAFC] rounded-[2rem] p-8 border border-[#EAF2F8] hover:shadow-lg transition-shadow">
-                            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-sm">
+                        <div className="bg-[#F8FAFC] dark:bg-[#111] rounded-[2rem] p-8 border border-[#EAF2F8] dark:border-white/5 hover:shadow-lg transition-all duration-500">
+                            <div className="w-14 h-14 bg-white dark:bg-[#1A1A1A] rounded-2xl flex items-center justify-center mb-8 shadow-sm transition-colors">
                                 <Wand2 className="w-6 h-6 text-blue-500" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">AI Generator</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed font-medium">Turn text into fully responsive HTML/CSS/JS instantly with our proprietary LLM tuned for modern UI patterns.</p>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">AI Generator</h3>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-medium transition-colors">Turn text into fully responsive HTML/CSS/JS instantly with our proprietary LLM tuned for modern UI patterns.</p>
                         </div>
-                        <div className="bg-[#F8FAFC] rounded-[2rem] p-8 border border-[#EAF2F8] hover:shadow-lg transition-shadow">
-                            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-sm">
+                        <div className="bg-[#F8FAFC] dark:bg-[#111] rounded-[2rem] p-8 border border-[#EAF2F8] dark:border-white/5 hover:shadow-lg transition-all duration-500">
+                            <div className="w-14 h-14 bg-white dark:bg-[#1A1A1A] rounded-2xl flex items-center justify-center mb-8 shadow-sm transition-colors">
                                 <Layers className="w-6 h-6 text-indigo-500" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Live Editor</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed font-medium">Real-time visual adjustments without touching code. Click any element and tell the AI what you want to change.</p>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">Live Editor</h3>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-medium transition-colors">Real-time visual adjustments without touching code. Click any element and tell the AI what you want to change.</p>
                         </div>
-                        <div className="bg-[#F8FAFC] rounded-[2rem] p-8 border border-[#EAF2F8] hover:shadow-lg transition-shadow">
-                            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-sm">
+                        <div className="bg-[#F8FAFC] dark:bg-[#111] rounded-[2rem] p-8 border border-[#EAF2F8] dark:border-white/5 hover:shadow-lg transition-all duration-500">
+                            <div className="w-14 h-14 bg-white dark:bg-[#1A1A1A] rounded-2xl flex items-center justify-center mb-8 shadow-sm transition-colors">
                                 <Users className="w-6 h-6 text-teal-500" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Community Hub</h3>
-                            <p className="text-gray-500 text-sm leading-relaxed font-medium">Share templates, prompt recipes, and get inspired by a global community of modern web developers.</p>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">Community Hub</h3>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed font-medium transition-colors">Share templates, prompt recipes, and get inspired by a global community of modern web developers.</p>
                         </div>
                     </div>
                 </section>
 
                 {/* Testimonials Section */}
-                <section className="w-full max-w-[1200px] mx-auto px-6 py-24 bg-white">
+                <section className="w-full max-w-[1200px] mx-auto px-6 py-24 bg-white dark:bg-[#0A0A0B] transition-colors duration-500">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 mb-6 uppercase">What People<br />Are Saying</h2>
-                        <p className="text-gray-500 text-lg font-medium max-w-xl mx-auto">Join thousands of developers and designers who build with DivStack AI every day.</p>
+                        <h2 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-6 uppercase transition-colors">What People<br />Are Saying</h2>
+                        <p className="text-gray-500 dark:text-gray-400 text-lg font-medium max-w-xl mx-auto transition-colors">Join thousands of developers and designers who build with DivStack AI every day.</p>
                     </div>
 
                     <div className="relative min-h-[320px] flex items-center justify-center">
                         {/* Background decorative elements */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-100/40 rounded-full blur-[80px] pointer-events-none"></div>
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-100/40 dark:bg-blue-500/10 rounded-full blur-[80px] pointer-events-none transition-colors"></div>
 
                         {/* Testimonial Card */}
                         <div
                             key={activeTestimonial}
                             className={`w-full max-w-2xl mx-auto ${testimonialFading ? 'testimonial-fade-out' : 'testimonial-fade-in'}`}
                         >
-                            <div className="bg-[#F8FAFC] rounded-[2.5rem] p-10 md:p-12 border border-[#EAF2F8] shadow-sm relative">
+                            <div className="bg-[#F8FAFC] dark:bg-[#111] rounded-[2.5rem] p-10 md:p-12 border border-[#EAF2F8] dark:border-white/5 shadow-sm relative transition-colors duration-500">
                                 {/* Quote Icon */}
                                 <div className="absolute -top-5 left-10">
                                     <div className="w-10 h-10 bg-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -531,7 +531,7 @@ export default function Home() {
                                 </div>
 
                                 {/* Quote Text */}
-                                <p className="text-gray-700 text-lg md:text-xl leading-relaxed font-medium mb-8">
+                                <p className="text-gray-700 dark:text-gray-300 text-lg md:text-xl leading-relaxed font-medium mb-8 transition-colors">
                                     "{testimonials[activeTestimonial].quote}"
                                 </p>
 
@@ -541,8 +541,8 @@ export default function Home() {
                                         {testimonials[activeTestimonial].name.split(' ').map(n => n[0]).join('')}
                                     </div>
                                     <div>
-                                        <div className="font-bold text-gray-900 text-sm">{testimonials[activeTestimonial].name}</div>
-                                        <div className="text-gray-500 text-xs font-medium">{testimonials[activeTestimonial].role}</div>
+                                        <div className="font-bold text-gray-900 dark:text-white text-sm transition-colors">{testimonials[activeTestimonial].name}</div>
+                                        <div className="text-gray-500 dark:text-gray-400 text-xs font-medium transition-colors">{testimonials[activeTestimonial].role}</div>
                                     </div>
                                 </div>
                             </div>
@@ -555,7 +555,7 @@ export default function Home() {
                                     key={i}
                                     className={`h-2 rounded-full transition-all duration-500 ${i === activeTestimonial
                                         ? 'w-8 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]'
-                                        : 'w-2 bg-gray-300'
+                                        : 'w-2 bg-gray-300 dark:bg-gray-700'
                                         }`}
                                 />
                             ))}
@@ -565,7 +565,7 @@ export default function Home() {
 
                 {/* CTA Section */}
                 <section className="w-full max-w-[1000px] mx-auto px-6 py-12 mb-12">
-                    <div className="rounded-[3rem] bg-blue-600 p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+                    <div className="rounded-[3rem] bg-blue-600 dark:bg-blue-700 p-12 md:p-20 text-center relative overflow-hidden shadow-2xl transition-colors duration-500">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/30 rounded-full blur-3xl"></div>
 
