@@ -58,8 +58,8 @@ Follow these instructions to set up the project locally on your machine.
 
 ### Prerequisites
 - Node.js (v18 or higher)
-- PostgreSQL Database (Local or Cloud like Supabase/Neon)
-- OpenRouter API Key (or OpenAI API Key)
+- PostgreSQL Database (Local or Cloud like [Supabase](https://supabase.com)/[Neon](https://neon.tech))
+- NVIDIA AI API Key (from [build.nvidia.com](https://build.nvidia.com))
 
 ### Installation
 
@@ -74,17 +74,25 @@ Follow these instructions to set up the project locally on your machine.
    cd server
    npm install
    ```
-   Create a `.env` file in the `server` directory and add the following variables:
-   ```env
-   PORT=3000
-   DATABASE_URL="postgresql://user:password@localhost:5432/divstack_db?schema=public"
-   DIRECT_URL="postgresql://user:password@localhost:5432/divstack_db?schema=public"
-   AI_API_KEY="your_openrouter_or_openai_api_key"
-   BETTER_AUTH_SECRET="your_secure_random_string"
-   TRUSTED_ORIGINS="http://localhost:5173"
-   NODE_ENV="development"
+   Copy the example env file and fill in your own values:
+   ```bash
+   cp .env.example .env
    ```
-   Run Prisma migrations to set up your database schema:
+   Open `server/.env` and update these fields:
+   ```env
+   # Get these from your Supabase project → Settings → Database → Connection string
+   DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/postgres"
+   DIRECT_URL="postgresql://USER:PASSWORD@HOST:5432/postgres"
+
+   # Get API keys from https://build.nvidia.com
+   AI_API_KEY="your_nvidia_api_key"
+   DEEPSEEK_API_KEY="your_deepseek_api_key"
+
+   # Generate a random secret — run this in terminal:
+   #   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   BETTER_AUTH_SECRET="paste_your_generated_secret_here"
+   ```
+   Run Prisma to set up your database tables:
    ```bash
    npx prisma generate
    npx prisma db push
@@ -100,6 +108,12 @@ Follow these instructions to set up the project locally on your machine.
    cd client
    npm install
    ```
+   Copy the example env file:
+   ```bash
+   cp .env.example .env
+   ```
+   > The default `VITE_BASE_URL=http://localhost:3000` should work out of the box.
+
    Start the frontend development server:
    ```bash
    npm run dev
@@ -107,6 +121,12 @@ Follow these instructions to set up the project locally on your machine.
 
 4. **Open your browser**
    Navigate to `http://localhost:5173` to see the application running.
+
+> **⚠️ Troubleshooting:** If sign-in/sign-up fails, make sure:
+> - The backend server is running on port 3000
+> - Your `DATABASE_URL` in `server/.env` is correct and the database is accessible
+> - You ran `npx prisma db push` to create the database tables
+> - The `client/.env` file exists with `VITE_BASE_URL=http://localhost:3000`
 
 ## 💡 How it Works
 

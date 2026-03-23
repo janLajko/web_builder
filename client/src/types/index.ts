@@ -10,10 +10,13 @@ export interface WebsiteProject {
     id: string;
     name: string;
     description?: string;
+    initialPrompt?: string;
+    currentCode?: string;
     isPublic: boolean;
     createdAt: string;
     updatedAt: string;
     versions?: Version[];
+    conversations?: Conversation[];
 }
 
 export interface Version {
@@ -27,7 +30,7 @@ export interface Version {
 export interface Conversation {
     id: string;
     role: string;
-    message: string;
+    content: string;
     createdAt: string;
 }
 

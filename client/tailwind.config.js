@@ -111,6 +111,12 @@ module.exports = {
                     '66%': { transform: 'rotate(-3deg) scale(0.95)', opacity: '0.35' },
                     '100%': { transform: 'rotate(0deg) scale(1)', opacity: '0.3' },
                 },
+                lineSwipe: {
+                    '0%': { transform: 'translateX(-100%)', opacity: '0' },
+                    '10%': { opacity: '1' },
+                    '90%': { opacity: '1' },
+                    '100%': { transform: 'translateX(100%)', opacity: '0' },
+                },
             },
             animation: {
                 'scroll-left': 'scrollLeft 30s linear infinite',
@@ -126,6 +132,7 @@ module.exports = {
                 'counter-pulse': 'counterPulse 0.3s ease-out',
                 'float': 'float 6s ease-in-out infinite',
                 'aurora': 'aurora 8s ease-in-out infinite',
+                'line-swipe': 'lineSwipe 2.5s ease-out infinite',
             }
         }
     },

@@ -1,20 +1,28 @@
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Send, Sparkles, Settings, User as UserIcon, CheckCircle2, RotateCcw, Square, Code2, Paintbrush, FileJson, Cpu } from 'lucide-react'
-import type { Version, WebsiteProject } from '../types'
+import type { Version, WebsiteProject, Conversation } from '../types'
+import { Tooltip } from './ui/Tooltip'
 
 interface SidebarProps {
     project: WebsiteProject | null;
     versions: Version[];
+    conversations: Conversation[];
     onPrompt: (prompt: string) => void;
     onRollback: (versionId: string) => void;
     loading?: boolean;
     step?: number;
     pendingPrompt?: string;
     onStop: () => void;
+    prompt: string;
+    setPrompt: (val: string) => void;
 }
 
-export const Sidebar = ({ project, versions, onPrompt, onRollback, loading, step = 0, pendingPrompt, onStop }: SidebarProps) => {
-    const [prompt, setPrompt] = useState('')
+export const Sidebar = ({ project, versions, conversations, onPrompt, onRollback, loading, step = 0, pendingPrompt, onStop, prompt, setPrompt }: SidebarProps) => {
+    const chatEndRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [conversations, loading])
 
     const handleSend = () => {
         if (!prompt.trim()) return
@@ -39,28 +47,55 @@ export const Sidebar = ({ project, versions, onPrompt, onRollback, loading, step
                     <div className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-1">CURRENT PROJECT</div>
                     <div className="text-sm font-bold text-white tracking-wide">{project?.name || "Untitled Project"}</div>
                 </div>
-                <button className="p-2 rounded-lg text-[#9CA3AF] hover:text-white hover:bg-white/5 transition-colors">
-                    <Settings className="w-5 h-5" />
-                </button>
+                <Tooltip content="Project Settings" placement="bottom">
+                    <button className="p-2 rounded-lg text-[#9CA3AF] hover:text-white hover:bg-white/5 transition-colors">
+                        <Settings className="w-5 h-5" />
+                    </button>
+                </Tooltip>
             </div>
 
             {/* Main scrollable area */}
             <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col">
                 {/* Chat Area */}
                 <div className="p-4 space-y-6 flex-1">
-                    {/* Welcome AI Message */}
-                    <div className="flex gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#0D1117] flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.15)] border border-[#3B82F6]/20">
-                            <Sparkles className="w-4 h-4 text-[#3B82F6]" />
+                    {/* Welcome AI Message (only if no conversation history) */}
+                    {conversations.length === 0 && (
+                        <div className="flex gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-[#0D1117] flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.15)] border border-[#3B82F6]/20">
+                                <Sparkles className="w-4 h-4 text-[#3B82F6]" />
+                            </div>
+                            <div className="bg-[#0D1117]/60 border border-white/5 p-3.5 rounded-xl rounded-tl-sm text-[13px] text-[#e2e8f0] leading-relaxed shadow-sm backdrop-blur-sm">
+                                Hello! I'm ready to help you build.<br />
+                                What would you like to create today?
+                            </div>
                         </div>
-                        <div className="bg-[#0D1117]/60 border border-white/5 p-3.5 rounded-xl rounded-tl-sm text-[13px] text-[#e2e8f0] leading-relaxed shadow-sm backdrop-blur-sm">
-                            Hello! I've loaded your dashboard template.<br />
-                            What changes would you like to make today?
-                        </div>
-                    </div>
+                    )}
 
-                    {/* Show the pending prompt if it exists */}
-                    {pendingPrompt && !versions.length && (
+                    {/* Render full conversation history */}
+                    {conversations.map((msg) => (
+                        msg.role === 'user' ? (
+                            <div key={msg.id} className="flex gap-3 justify-end">
+                                <div className="bg-[#3B82F6] p-3.5 rounded-xl rounded-tr-sm text-[13px] text-white font-medium leading-relaxed shadow-[0_0_15px_rgba(59,130,246,0.2)] max-w-[85%]">
+                                    {msg.content}
+                                </div>
+                                <div className="w-8 h-8 rounded-lg bg-[#0D1117] flex items-center justify-center shrink-0 border border-white/10">
+                                    <UserIcon className="w-4 h-4 text-[#9CA3AF]" />
+                                </div>
+                            </div>
+                        ) : (
+                            <div key={msg.id} className="flex gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-[#0D1117] flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.15)] border border-[#3B82F6]/20">
+                                    <Sparkles className="w-4 h-4 text-[#3B82F6]" />
+                                </div>
+                                <div className="bg-[#0D1117]/60 border border-white/5 p-3.5 rounded-xl rounded-tl-sm text-[13px] text-[#e2e8f0] leading-relaxed shadow-sm backdrop-blur-sm max-w-[85%]">
+                                    {msg.content}
+                                </div>
+                            </div>
+                        )
+                    ))}
+
+                    {/* Show the pending prompt if generating for the first time */}
+                    {pendingPrompt && !versions.length && conversations.length === 0 && (
                         <div className="flex gap-3 justify-end">
                             <div className="bg-[#3B82F6] p-3.5 rounded-xl rounded-tr-sm text-[13px] text-white font-medium leading-relaxed shadow-[0_0_15px_rgba(59,130,246,0.2)] max-w-[85%]">
                                 {pendingPrompt}
@@ -71,17 +106,7 @@ export const Sidebar = ({ project, versions, onPrompt, onRollback, loading, step
                         </div>
                     )}
 
-                    {/* Show the last prompt submitted by user */}
-                    {versions.length > 0 && versions[0].prompt && (
-                        <div className="flex gap-3 justify-end">
-                            <div className="bg-[#3B82F6] p-3.5 rounded-xl rounded-tr-sm text-[13px] text-white font-medium leading-relaxed shadow-[0_0_15px_rgba(59,130,246,0.2)] max-w-[85%]">
-                                {versions[0].prompt}
-                            </div>
-                            <div className="w-8 h-8 rounded-lg bg-[#0D1117] flex items-center justify-center shrink-0 border border-white/10">
-                                <UserIcon className="w-4 h-4 text-[#9CA3AF]" />
-                            </div>
-                        </div>
-                    )}
+                    <div ref={chatEndRef} />
 
                     {/* Loading status */}
                     {loading && (
@@ -155,24 +180,27 @@ export const Sidebar = ({ project, versions, onPrompt, onRollback, loading, step
                             className="w-full h-[52px] py-3.5 px-4 bg-transparent resize-none focus:outline-none text-[13px] text-white placeholder:text-[#9CA3AF]/60 font-medium no-scrollbar flex-1"
                         />
                         {loading ? (
-                            <button
-                                onClick={onStop}
-                                className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 bg-red-500/20 text-red-500 hover:bg-red-500/30 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)] hover:scale-105 active:scale-90"
-                                title="Stop Generation"
-                            >
-                                <Square className="w-4 h-4 fill-current" />
-                            </button>
+                            <Tooltip content="Stop Generation" placement="top">
+                                <button
+                                    onClick={onStop}
+                                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 bg-red-500/20 text-red-500 hover:bg-red-500/30 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)] hover:scale-105 active:scale-90"
+                                >
+                                    <Square className="w-4 h-4 fill-current" />
+                                </button>
+                            </Tooltip>
                         ) : (
-                            <button
-                                onClick={handleSend}
-                                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 ${prompt.trim()
-                                    ? 'bg-[#3B82F6] text-white shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:scale-105 active:scale-90'
-                                    : 'bg-white/5 text-[#9CA3AF] cursor-not-allowed'
-                                    }`}
-                                disabled={!prompt.trim()}
-                            >
-                                <Send className="w-4 h-4" />
-                            </button>
+                            <Tooltip content="Send Prompt" placement="top">
+                                <button
+                                    onClick={handleSend}
+                                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 shrink-0 ${prompt.trim()
+                                        ? 'bg-[#3B82F6] text-white shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:scale-105 active:scale-90'
+                                        : 'bg-white/5 text-[#9CA3AF] cursor-not-allowed'
+                                        }`}
+                                    disabled={!prompt.trim()}
+                                >
+                                    <Send className="w-4 h-4" />
+                                </button>
+                            </Tooltip>
                         )}
                     </div>
                 </div>

@@ -8,12 +8,12 @@ dotenv.config();
 
 // List of models to try in order — if the first fails (rate limit/timeout), try the next
 const MODELS = [
-    "meta/llama-3.1-70b-instruct",
-    "deepseek-ai/deepseek-v3.2",
-    "meta/llama-3.1-405b-instruct"
+    process.env.PRIMARY_AI_MODEL || "qwen/qwen2.5-coder-32b-instruct",
+    process.env.SECONDARY_AI_MODEL || "qwen/qwen2.5-coder-32b-instruct",
+    process.env.TERTIARY_AI_MODEL || "qwen/qwen2.5-coder-32b-instruct"
 ];
 
-const TIMEOUT_MS = 600000; // 10 minutes timeout
+const TIMEOUT_MS = 900000; // 15 minutes timeout
 
 async function callAIWithFallback(messages: Array<{ role: string; content: string }>): Promise<string> {
     let lastError: any = null;
@@ -28,6 +28,7 @@ async function callAIWithFallback(messages: Array<{ role: string; content: strin
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+            const isDeepSeek = model.toLowerCase().includes('deepseek');
             const completion = await client.chat.completions.create(
                 {
                     model,
@@ -35,6 +36,11 @@ async function callAIWithFallback(messages: Array<{ role: string; content: strin
                     temperature: 0.2,
                     top_p: 0.7,
                     max_tokens: 8192,
+                    ...(isDeepSeek && { 
+                        extra_body: { 
+                            chat_template_kwargs: { thinking: true } 
+                        } 
+                    }) as any,
                 },
                 { signal: controller.signal as any }
             );
@@ -154,11 +160,23 @@ export const createProject = async (req: Request, res: Response) => {
             enhancedPrompt = normalizedPrompt; // Fall back to original prompt
         }
 
+const SYSTEM_PROMPT = `You are an elite web developer. Generate a PRODUCTION-READY static website with a STUNNING design.
+
+RULES:
+1. Output ONLY these files: index.html, script.js.
+2. DO NOT generate style.css, package.json, or any other files.
+3. Use Tailwind CSS for ALL styling. You MUST include <script src="https://cdn.tailwindcss.com"></script> in the <head>.
+4. CRITICAL: NEVER include <link rel="stylesheet" href="style.css">.
+5. MODERN DESIGN: Use gradients, beautiful typography (Inter/Poppins), and spacious layouts.
+6. IMAGES: Use high-quality Unsplash images. Pattern: https://images.unsplash.com/photo-[ID]?auto=format&fit=crop&q=80&w=1200
+7. LAYOUT: Ensure <html class="h-full"> and <body class="h-full m-0 p-0 text-gray-900 bg-white">.
+8. BE CONCISE. Ensure every <file> tag is closed. NO conversational text.`;
+
         // Step 2: Generate the actual website code (with fallback)
         const code = await callAIWithFallback([
             {
                 role: "system",
-                content: `You are an expert react/tailwind developer. Generate raw HTML with tailwind classes for the next request. Only output html code. Use inline styles sparingly.`
+                content: SYSTEM_PROMPT
             },
             {
                 role: "user",
@@ -223,7 +241,10 @@ export const getSingleProject = async (req: Request, res: Response) => {
         const { id } = req.params;
         const project = await prisma.websiteProject.findFirst({
             where: { id, userId: req.userId },
-            include: { versions: { orderBy: { createdAt: 'desc' } } }
+            include: {
+                versions: { orderBy: { createdAt: 'desc' } },
+                conversations: { orderBy: { createdAt: 'asc' } }
+            }
         });
         if (!project) return res.status(404).json({ message: "Project not found" });
         res.json(project);

@@ -1,6 +1,6 @@
 import { Navbar } from "../components/Navbar"
 import { Footer } from "../components/Footer"
-import { Terminal, Code2, Zap, LayoutTemplate } from "lucide-react"
+import { Terminal, Code2, Zap } from "lucide-react"
 
 export default function Documentation() {
     return (
@@ -65,17 +65,6 @@ export default function Documentation() {
                             </ul>
                         </section>
 
-                        <section>
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-teal-100 dark:bg-teal-900/20 rounded-lg transition-colors">
-                                    <LayoutTemplate className="w-5 h-5 text-teal-500 dark:text-teal-400" />
-                                </div>
-                                <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-wide transition-colors">Using Templates</h2>
-                            </div>
-                            <p>
-                                Short on time? You can start with one of our pre-built, production-ready templates. Navigate to the Templates page, select a design, and the AI will use it as a foundational baseline before applying your custom modifications. This is perfect for standardizing layouts while retaining unique branding.
-                            </p>
-                        </section>
 
                         <section className="pt-8 border-t border-gray-200 dark:border-white/10 transition-colors">
                             <p className="text-sm font-bold tracking-wide">

@@ -1,0 +1,399 @@
+﻿Project: make the car washing website with clean colors
+ID: 4c331126-d445-4cb0-b276-914b77ca6e43
+--- LATEST CODE ---
+<file path="src/theme.ts">
+import { extendTheme } from '@chakra-ui/react';
+
+const theme = extendTheme({
+  colors: {
+    primary: {
+      50: '#e0f7fa',
+      100: '#b2ebf2',
+      200: '#80deea',
+      300: '#4dd0e1',
+      400: '#26c6da',
+      500: '#00bcd4',
+      600: '#00acc1',
+      700: '#0097a7',
+      800: '#00838f',
+      900: '#006064',
+    },
+    secondary: {
+      50: '#f9f9f9',
+      100: '#f1f1f1',
+      200: '#e8e8e8',
+      300: '#d5d5d5',
+      400: '#c2c2c2',
+      500: '#afafaf',
+      600: '#9b9b9b',
+      700: '#888888',
+      800: '#757575',
+      900: '#616161',
+    },
+  },
+  fonts: {
+    body: 'Roboto, sans-serif',
+    heading: 'Roboto, sans-serif',
+  },
+  transitions: {
+    property: {
+      common: 'background-color, border-color, color, fill, stroke, opacity, box-shadow, transform',
+      colors: 'background-color, border-color, color, fill, stroke',
+      dimensions: 'width, height',
+      position: 'left, right, top, bottom',
+      background: 'background-color, background-image, background-position',
+      opacity: 'opacity',
+      shadow: 'box-shadow',
+      transform: 'transform',
+    },
+    easing: {
+      'in': 'cubic-bezier(0.4, 0, 1, 1)',
+      'out': 'cubic-bezier(0, 0, 0.2, 1)',
+      'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+    duration: {
+      'ultra-fast': '50ms',
+      'fast': '100ms',
+      'normal': '200ms',
+      'slow': '300ms',
+      'ultra-slow': '400ms',
+    },
+  },
+});
+
+export default theme;
+</file>
+<file path="src/styles/globals.css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-secondary-50 text-secondary-900 font-body;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading;
+}
+
+a {
+  @apply text-primary-500 hover:text-primary-700 transition-colors duration-200;
+}
+
+button {
+  @apply bg-primary-500 text-secondary-50 hover:bg-primary-700 transition-colors duration-200;
+}
+
+input, textarea {
+  @apply border-secondary-300 focus:border-primary-500 focus:ring-primary-500 focus:ring-2;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    @apply bg-secondary-900 text-secondary-50;
+  }
+
+  a {
+    @apply text-primary-300 hover:text-primary-100;
+  }
+
+  button {
+    @apply bg-primary-300 text-secondary-900 hover:bg-primary-100;
+  }
+
+  input, textarea {
+    @apply border-secondary-700 focus:border-primary-300 focus:ring-primary-300;
+  }
+}
+</file>
+<file path="src/components/Navbar.tsx">
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { FaFacebookF, FaTwitter, FaInstagram } from 'react-icons/fa';
+
+const Navbar: React.FC = () => {
+  return (
+    <nav className="bg-secondary-100 shadow-md">
+      <div className="container mx-auto px-4 py-6 flex justify-between items-center">
+        <Link to="/" className="text-2xl font-bold text-primary-500">
+          Sparkle Wash
+        </Link>
+        <ul className="flex space-x-6">
+          <li>
+            <Link to="/" className="hover:text-primary-700 transition-colors duration-200">
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link to="/about" className="hover:text-primary-700 transition-colors duration-200">
+              About Us
+            </Link>
+          </li>
+          <li>
+            <Link to="/pricing" className="hover:text-primary-700 transition-colors duration-200">
+              Pricing
+            </Link>
+          </li>
+          <li>
+            <Link to="/gallery" className="hover:text-primary-700 transition-colors duration-200">
+              Gallery
+            </Link>
+          </li>
+          <li>
+            <Link to="/contact" className="hover:text-primary-700 transition-colors duration-200">
+              Contact
+            </Link>
+          </li>
+        </ul>
+        <div className="flex space-x-4">
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-700 transition-colors duration-200">
+            <FaFacebookF />
+          </a>
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-700 transition-colors duration-200">
+            <FaTwitter />
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-700 transition-colors duration-200">
+            <FaInstagram />
+          </a>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
+</file>
+<file path="src/components/Footer.tsx">
+import React from 'react';
+import { FaFacebookF, FaTwitter, FaInstagram } from 'react-icons/fa';
+
+const Footer: React.FC = () => {
+  return (
+    <footer className="bg-secondary-100 py-8">
+      <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+        <div className="mb-4 md:mb-0">
+          <p className="text-secondary-700">┬⌐ 2023 Sparkle Wash. All rights reserved.</p>
+        </div>
+        <div className="flex space-x-4">
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-700 transition-colors duration-200">
+            <FaFacebookF />
+          </a>
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-700 transition-colors duration-200">
+            <FaTwitter />
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-primary-500 hover:text-primary-700 transition-colors duration-200">
+            <FaInstagram />
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
+</file>
+<file path="src/pages/Home.tsx">
+import React from 'react';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+
+const Home: React.FC = () => {
+  return (
+    <div>
+      <Navbar />
+      <section className="bg-primary-500 text-secondary-50 py-24">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">Experience Sparkling Clean</h1>
+          <p className="text-xl md:text-2xl mb-12">Discover the ultimate car wash experience with Sparkle Wash.</p>
+          <a href="#services" className="bg-primary-700 hover:bg-primary-900 text-secondary-50 px-6 py-3 rounded-full transition-colors duration-200">
+            Learn More
+          </a>
+        </div>
+      </section>
+      <section className="py-24" id="services">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-secondary-100 p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold mb-4">Basic Wash</h3>
+              <p className="text-secondary-700 mb-6">A thorough exterior wash to leave your car looking fresh and clean.</p>
+              <a href="/pricing" className="text-primary-500 hover:text-primary-700 transition-colors duration-200">
+                View Pricing
+              </a>
+            </div>
+            <div className="bg-secondary-100 p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold mb-4">Detailing</h3>
+              <p className="text-secondary-700 mb-6">A deep clean that includes waxing, polishing, and more.</p>
+              <a href="/pricing" className="text-primary-500 hover:text-primary-700 transition-colors duration-200">
+                View Pricing
+              </a>
+            </div>
+            <div className="bg-secondary-100 p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold mb-4">Mobile Service</h3>
+              <p className="text-secondary-700 mb-6">We come to you with our mobile car wash services.</p>
+              <a href="/pricing" className="text-primary-500 hover:text-primary-700 transition-colors duration-200">
+                View Pricing
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="bg-secondary-100 py-24">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12">Why Choose Sparkle Wash?</h2>
+          <p className="text-xl md:text-2xl text-secondary-700 mb-12">Experience the difference with Sparkle Wash. Our team of experts is dedicated to providing the highest quality car wash services.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold mb-4">Professional Team</h3>
+              <p className="text-secondary-700">Our team of experts is dedicated to providing the highest quality car wash services.</p>
+            </div>
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold mb-4">High-Quality Products</h3>
+              <p className="text-secondary-700">We use only the best products to ensure your car is left looking its best.</p>
+            </div>
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold mb-4">Convenient Locations</h3>
+              <p className="text-secondary-700">We offer multiple locations and mobile services to make it easy for you to get your car washed.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </div>
+  );
+};
+
+export default Home;
+</file>
+<file path="src/App.tsx">
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import Pricing from './pages/Pricing';
+import Gallery from './pages/Gallery';
+import Contact from './pages/Contact';
+
+const App: React.FC = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
+</file>
+<file path="src/pages/About.tsx">
+import React from 'react';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+
+const About: React.FC = () => {
+  return (
+    <div>
+      <Navbar />
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">About Us</h2>
+          <p className="text-xl md:text-2xl text-secondary-700 mb-12">Welcome to Sparkle Wash, your go-to destination for professional car wash services. We are dedicated to providing the highest quality car wash experience to leave your car looking its best.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
+              <p className="text-secondary-700">Our mission is to provide exceptional car wash services that exceed your expectations. We are committed to using the highest quality products and techniques to ensure your car is left looking its best.</p>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold mb-4">Our Team</h3>
+              <p className="text-secondary-700">Our team of experts is dedicated to providing the highest quality car wash services. We are passionate about what we do and strive to provide the best possible experience for every customer.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </div>
+  );
+};
+
+export default About;
+</file>
+<file path="src/pages/Pricing.tsx">
+import React from 'react';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+
+const Pricing: React.FC = () => {
+  return (
+    <div>
+      <Navbar />
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Pricing</h2>
+          <p className="text-xl md:text-2xl text-secondary-700 mb-12">We offer a variety of car wash services at transparent rates. Choose the service that best fits your needs.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-secondary-100 p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold mb-4">Basic Wash</h3>
+              <p className="text-3xl font-bold text-primary-500 mb-6">$15</p>
+              <ul className="list-disc list-inside mb-6">
+                <li>Exterior wash</li>
+                <li>Vacuuming</li>
+                <li>Tire shine</li>
+              </ul>
+              <a href="/contact" className="bg-primary-500 hover:bg-primary-700 text-secondary-50 px-6 py-3 rounded-full transition-colors duration-200">
+                Book Now
+              </a>
+            </div>
+            <div className="bg-secondary-100 p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold mb-4">Detailing</h3>
+              <p className="text-3xl font-bold text-primary-500 mb-6">$45</p>
+              <ul className="list-disc list-inside mb-6">
+                <li>Exterior wash</li>
+                <li>Vacuuming</li>
+                <li>Tire shine</li>
+                <li>Interior cleaning</li>
+                <li>Waxing</li>
+                <li>Polishing</li>
+              </ul>
+              <a href="/contact" className="bg-primary-500 hover:bg-primary-700 text-secondary-50 px-6 py-3 rounded-full transition-colors duration-200">
+                Book Now
+              </a>
+            </div>
+            <div className="bg-secondary-100 p-8 rounded-lg shadow-md">
+              <h3 className="text-2xl font-bold mb-4">Mobile Service</h3>
+              <p className="text-3xl font-bold text-primary-500 mb-6">$25</p>
+              <ul className="list-disc list-inside mb-6">
+                <li>Exterior wash</li>
+                <li>Vacuuming</li>
+                <li>Tire shine</li>
+              </ul>
+              <a href="/contact" className="bg-primary-500 hover:bg-primary-700 text-secondary-50 px-6 py-3 rounded-full transition-colors duration-200">
+                Book Now
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </div>
+  );
+};
+
+export default Pricing;
+</file>
+<file path="src/pages/Gallery.tsx">
+import React from 'react';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+
+const Gallery: React.FC = () => {
+  return (
+    <div>
+      <Navbar />
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Gallery</h2

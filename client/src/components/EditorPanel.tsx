@@ -1,4 +1,5 @@
-import { SlidersHorizontal, Palette, Type, Layout } from 'lucide-react'
+import { SlidersHorizontal, Palette, Type, Layout, Hexagon } from 'lucide-react'
+import { Popover } from './ui/Popover'
 
 export const EditorPanel = () => {
     return (
@@ -66,7 +67,39 @@ export const EditorPanel = () => {
                 <div className="space-y-3">
                     <div className="flex items-center justify-between text-xs font-bold text-[#9CA3AF] uppercase tracking-wider mb-2">
                         <div className="flex items-center gap-2"><Palette className="w-3.5 h-3.5" /> Styles</div>
-                        <button className="text-[10px] text-[#00E87B] hover:text-white transition-colors">Edit Theme</button>
+                        <Popover
+                            placement="left-start"
+                            trigger={
+                                <button className="text-[10px] text-[#00E87B] hover:text-white transition-colors cursor-pointer">
+                                    Edit Theme
+                                </button>
+                            }
+                            content={
+                                <div className="space-y-4 w-[200px]">
+                                    <div className="text-sm font-bold text-white flex items-center gap-2">
+                                        <Hexagon className="w-4 h-4 text-[#FF3FD8]" /> Theme Settings
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="text-xs text-[#9CA3AF]">Accent Color</div>
+                                        <div className="flex gap-2">
+                                            <div className="w-6 h-6 rounded-full bg-[#9333EA] cursor-pointer hover:scale-110 transition-transform ring-2 ring-white/20"></div>
+                                            <div className="w-6 h-6 rounded-full bg-[#FF3FD8] cursor-pointer hover:scale-110 transition-transform"></div>
+                                            <div className="w-6 h-6 rounded-full bg-[#3B82F6] cursor-pointer hover:scale-110 transition-transform"></div>
+                                            <div className="w-6 h-6 rounded-full bg-[#10B981] cursor-pointer hover:scale-110 transition-transform"></div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2 pt-2 border-t border-white/10">
+                                        <div className="text-xs text-[#9CA3AF]">Radius</div>
+                                        <select className="w-full bg-[#0D1117] border border-white/10 text-white rounded-lg p-1.5 text-xs outline-none focus:border-[#FF3FD8]/50">
+                                            <option>Sharp (0px)</option>
+                                            <option>Default (8px)</option>
+                                            <option>Round (16px)</option>
+                                            <option>Pill (99px)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            }
+                        />
                     </div>
                     <div className="space-y-3 bg-[#050505]/50 p-3 rounded-xl border border-white/5">
                         <div className="flex items-center justify-between">

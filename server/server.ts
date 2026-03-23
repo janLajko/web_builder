@@ -6,6 +6,43 @@ import { toNodeHandler } from 'better-auth/node';
 import userRouter from './routes/userRoutes';
 import projectRouter from './routes/projectRoutes';
 
+// ---------------------------------------------------------------------------
+// Startup: Validate required environment variables
+// ---------------------------------------------------------------------------
+const REQUIRED_ENV_VARS = [
+    'DATABASE_URL',
+    'DIRECT_URL',
+    'BETTER_AUTH_SECRET',
+    'BETTER_AUTH_URL',
+] as const;
+
+const OPTIONAL_ENV_VARS = [
+    'AI_API_KEY',
+    'DEEPSEEK_API_KEY',
+] as const;
+
+const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
+if (missing.length > 0) {
+    console.error('\n' + '='.repeat(60));
+    console.error('❌  MISSING REQUIRED ENVIRONMENT VARIABLES');
+    console.error('='.repeat(60));
+    missing.forEach((key) => console.error(`   • ${key}`));
+    console.error('\nTo fix this:');
+    console.error('  1. Copy  server/.env.example  →  server/.env');
+    console.error('  2. Fill in your own values (database URL, secrets, etc.)');
+    console.error('  3. Run  npx prisma db push  to set up the database tables');
+    console.error('  4. Restart the server with  npm run dev');
+    console.error('='.repeat(60) + '\n');
+    process.exit(1);
+}
+
+const missingOptional = OPTIONAL_ENV_VARS.filter((key) => !process.env[key]);
+if (missingOptional.length > 0) {
+    console.warn('\n⚠️  Optional env vars not set (AI generation will not work):');
+    missingOptional.forEach((key) => console.warn(`   • ${key}`));
+    console.warn('   Copy values from server/.env.example\n');
+}
+
 const app = express();
 
 const trustedOrigins = [

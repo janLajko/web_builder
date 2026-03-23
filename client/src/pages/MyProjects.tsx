@@ -1,19 +1,18 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { api } from "../config/axios"
 import type { WebsiteProject } from "../types"
 import { Link } from "react-router-dom"
-import { Plus, Calendar, MoreVertical, Pencil, Trash2, X, Sparkles, Eye, Code2 } from "lucide-react"
+import { Plus, Calendar, Pencil, Trash2, X, Sparkles, Eye, Code2, Copy } from "lucide-react"
 import DashboardLayout from "../components/DashboardLayout"
 import toast from "react-hot-toast"
+import { ContextMenu, ContextMenuItem } from "../components/ui/ContextMenu"
 
 export default function MyProjects() {
     const [projects, setProjects] = useState<WebsiteProject[]>([])
-    const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
     const [renameModalProject, setRenameModalProject] = useState<WebsiteProject | null>(null)
     const [deleteModalProject, setDeleteModalProject] = useState<WebsiteProject | null>(null)
     const [newName, setNewName] = useState("")
     const [actionLoading, setActionLoading] = useState(false)
-    const menuRef = useRef<HTMLDivElement>(null)
 
     const fetchProjects = async () => {
         try {
@@ -28,15 +27,7 @@ export default function MyProjects() {
         fetchProjects()
     }, [])
 
-    useEffect(() => {
-        const handleClick = (e: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-                setMenuOpenId(null)
-            }
-        }
-        document.addEventListener("mousedown", handleClick)
-        return () => document.removeEventListener("mousedown", handleClick)
-    }, [])
+
 
     const handleRename = async () => {
         if (!renameModalProject || !newName.trim()) return
@@ -72,13 +63,19 @@ export default function MyProjects() {
     return (
         <DashboardLayout>
             {/* Page Header */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4 transition-colors duration-500">
-                <div>
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-2 uppercase transition-colors">My Projects</h1>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4 transition-colors duration-500 relative">
+                {/* Subtle Radial Glow Behind Header */}
+                <div className="absolute -top-10 -left-10 w-64 h-64 bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-[80px] pointer-events-none -z-10"></div>
+                
+                <div className="relative z-10">
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-2 uppercase transition-colors">
+                        My <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">Projects</span>
+                    </h1>
                     <p className="text-gray-500 dark:text-gray-400 font-medium text-lg transition-colors">Manage and deploy your high-performance AI models.</p>
                 </div>
-                <Link to="/ai-builder" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-sm uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <Plus className="w-5 h-5" /> Create New
+                <Link to="/ai-builder" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-sm uppercase tracking-widest shadow-xl hover:shadow-[0_10px_25px_-5px_rgba(37,99,235,0.4)] hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden group">
+                    <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0"></span>
+                    <Plus className="w-5 h-5 relative z-10" /> <span className="relative z-10">Create New</span>
                 </Link>
             </div>
 
@@ -87,50 +84,35 @@ export default function MyProjects() {
 
                 {projects.map((project) => (
                     <div key={project.id} className="bg-white/90 dark:bg-[#111]/90 backdrop-blur-3xl rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden group hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-300 shadow-sm flex flex-col relative hover:shadow-xl hover:-translate-y-1">
-                        {/* 3-dot menu button */}
-                        <button
-                            onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                setMenuOpenId(menuOpenId === project.id ? null : project.id)
-                            }}
-                            className="absolute top-3 right-3 z-30 p-2 rounded-xl bg-white/50 dark:bg-black/50 border border-gray-100 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-[#222] transition-colors backdrop-blur-md shadow-sm"
+                        <ContextMenu
+                            content={
+                                <>
+                                    <ContextMenuItem
+                                        icon={<Pencil className="w-4 h-4 text-blue-500" />}
+                                        onClick={() => {
+                                            setNewName(project.name || "")
+                                            setRenameModalProject(project)
+                                        }}
+                                    >
+                                        Rename
+                                    </ContextMenuItem>
+                                    <ContextMenuItem
+                                        icon={<Copy className="w-4 h-4 text-green-500" />}
+                                        onClick={() => toast.success("Duplicate coming soon!")}
+                                    >
+                                        Duplicate
+                                    </ContextMenuItem>
+                                    <div className="h-px bg-white/10 my-1 mx-2" />
+                                    <ContextMenuItem
+                                        icon={<Trash2 className="w-4 h-4 text-red-500" />}
+                                        onClick={() => setDeleteModalProject(project)}
+                                        danger
+                                    >
+                                        Delete
+                                    </ContextMenuItem>
+                                </>
+                            }
                         >
-                            <MoreVertical className="w-4 h-4" />
-                        </button>
-
-                        {/* Dropdown menu */}
-                        {menuOpenId === project.id && (
-                            <div
-                                ref={menuRef}
-                                className="absolute top-14 right-3 z-40 w-44 bg-white dark:bg-[#1A1A1A] border border-gray-100 dark:border-white/10 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 backdrop-blur-3xl transition-colors duration-500"
-                            >
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        e.stopPropagation()
-                                        setMenuOpenId(null)
-                                        setNewName(project.name || "")
-                                        setRenameModalProject(project)
-                                    }}
-                                    className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#222] transition-colors"
-                                >
-                                    <Pencil className="w-4 h-4 text-blue-500" /> Rename
-                                </button>
-                                <div className="h-px bg-gray-100 dark:bg-white/10 transition-colors" />
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        e.stopPropagation()
-                                        setMenuOpenId(null)
-                                        setDeleteModalProject(project)
-                                    }}
-                                    className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
-                                >
-                                    <Trash2 className="w-4 h-4" /> Delete
-                                </button>
-                            </div>
-                        )}
 
                         {/* Card content as a Link */}
                         <Link to={`/projects/${project.id}`} className="flex flex-col flex-1 cursor-pointer">
@@ -165,6 +147,7 @@ export default function MyProjects() {
                                 </div>
                             </div>
                         </Link>
+                        </ContextMenu>
                     </div>
                 ))}
 

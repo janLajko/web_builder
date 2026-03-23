@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../providers'
 import { authClient } from '../lib/authClient'
-import { LogOut, Coins, User as UserIcon, Search } from 'lucide-react'
+import { LogOut, Coins, User as UserIcon, Search, Folder, Settings as SettingsIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Dropdown, DropdownItem, DropdownSeparator } from './ui/Dropdown'
 
 export const Navbar = () => {
     const { user } = useAuth()
+    const navigate = useNavigate()
 
     const handleLogout = async () => {
         await authClient.signOut()
@@ -17,10 +20,10 @@ export const Navbar = () => {
 
                 <div className="flex items-center gap-8">
                     <Link to="/" className="flex items-center gap-2 group">
-                        <div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm dark:shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-                            <span className="text-white font-black text-xs">D</span>
+                        <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center p-1.5 shadow-md dark:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all group-hover:scale-110">
+                            <span className="text-white font-bold text-sm tracking-tighter">&lt;/&gt;</span>
                         </div>
-                        <span className="text-xl font-black uppercase tracking-tight text-gray-900 dark:text-white transition-colors">
+                        <span className="text-xl font-bold uppercase tracking-tight text-gray-900 dark:text-white transition-colors">
                             DivStack AI
                         </span>
                     </Link>
@@ -56,16 +59,25 @@ export const Navbar = () => {
                                 <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{user.credits}</span>
                             </div>
                             <div className="relative group">
-                                <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#1A1A1A] border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all">
-                                    <UserIcon className="w-5 h-5" />
-                                </button>
-                                <div className="absolute right-0 mt-2 w-48 rounded-2xl shadow-xl py-1 ring-1 ring-black/5 dark:ring-white/10 hidden group-hover:block animate-scale-in origin-top-right bg-white dark:bg-[#111] border border-gray-100 dark:border-white/10 backdrop-blur-xl transition-colors z-50">
-                                    <Link to="/my-projects" className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#222] hover:text-blue-600 dark:hover:text-blue-400 font-bold uppercase tracking-widest text-[10px] transition-colors">My Projects</Link>
-                                    <Link to="/settings" className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#222] hover:text-blue-600 dark:hover:text-blue-400 font-bold uppercase tracking-widest text-[10px] transition-colors">Settings</Link>
-                                    <button onClick={handleLogout} className="w-full text-left px-4 py-3 text-red-500 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 flex items-center gap-2 font-bold uppercase tracking-widest text-[10px] transition-colors">
-                                        <LogOut className="w-3.5 h-3.5" /> Sign out
-                                    </button>
-                                </div>
+                                <Dropdown
+                                    placement="bottom-end"
+                                    trigger={
+                                        <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white dark:bg-[#1A1A1A] border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all">
+                                            <UserIcon className="w-5 h-5" />
+                                        </button>
+                                    }
+                                >
+                                    <DropdownItem icon={<Folder className="w-4 h-4" />} onClick={() => navigate('/my-projects')}>
+                                        My Projects
+                                    </DropdownItem>
+                                    <DropdownItem icon={<SettingsIcon className="w-4 h-4" />} onClick={() => navigate('/settings')}>
+                                        Settings
+                                    </DropdownItem>
+                                    <DropdownSeparator />
+                                    <DropdownItem icon={<LogOut className="w-4 h-4" />} onClick={handleLogout} danger>
+                                        Sign out
+                                    </DropdownItem>
+                                </Dropdown>
                             </div>
                         </div>
                     ) : (

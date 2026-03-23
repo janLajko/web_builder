@@ -22,7 +22,7 @@ export default function AuthPage() {
                 await authClient.signIn.email(
                     { email, password },
                     {
-                        onSuccess: () => navigate("/templates"),
+                        onSuccess: () => navigate("/my-projects"),
                         onError: (ctx) => setError(ctx.error.message),
                     }
                 )
@@ -30,7 +30,7 @@ export default function AuthPage() {
                 await authClient.signUp.email(
                     { email, password, name },
                     {
-                        onSuccess: () => navigate("/templates"),
+                        onSuccess: () => navigate("/my-projects"),
                         onError: (ctx) => setError(ctx.error.message),
                     }
                 )
@@ -54,8 +54,8 @@ export default function AuthPage() {
             <div className="absolute bottom-1/4 right-[10%] w-[500px] h-[500px] bg-blue-100/40 dark:bg-purple-900/10 rounded-full blur-[100px] -z-10 mix-blend-overlay transition-colors"></div>
 
             <div className="mb-8 flex flex-col items-center gap-3 relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center shadow-lg">
-                    <Code2 className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center p-1.5 shadow-lg dark:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all">
+                    <span className="text-white font-bold text-xl tracking-widest">&lt;/&gt;</span>
                 </div>
                 <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase transition-colors">DivStack AI</h1>
                 <p className="text-gray-500 dark:text-gray-400 text-sm font-medium transition-colors">Design your future, seamlessly.</p>

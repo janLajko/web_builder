@@ -9,7 +9,6 @@ import Pricing from './pages/Pricing'
 import Settings from './pages/Settings'
 import Loading from './pages/Loading'
 import AuthPage from './pages/auth/AuthPage'
-import Templates from './pages/Templates'
 import OnboardingComplete from './pages/OnboardingComplete'
 import AIBuilder from './pages/AIBuilder'
 import Privacy from './pages/Privacy'
@@ -23,7 +22,6 @@ function App() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/auth" element={<AuthPage />} />
-                <Route path="/templates" element={<Templates />} />
                 <Route path="/onboarding-complete" element={<OnboardingComplete />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/projects/:id" element={<Projects />} />

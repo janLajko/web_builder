@@ -10,15 +10,17 @@ const openai = new OpenAI({
 
 async function testConnection() {
     try {
-        console.log("Testing NVIDIA API key...");
+        const model = process.env.PRIMARY_AI_MODEL || "qwen/qwen2.5-coder-32b-instruct";
+        console.log(`Testing NVIDIA API key with model: ${model}...`);
+        
         const completion = await openai.chat.completions.create({
-            model: "deepseek-ai/deepseek-v3.2",
+            model: model,
             messages: [
-                { role: "user", content: "Say 'API Key is working!'" }
+                { role: "user", content: "Say 'Qwen API is working!'" }
             ],
-            temperature: 1,
-            top_p: 0.95,
-            max_tokens: 8192,
+            temperature: 0.2,
+            top_p: 0.7,
+            max_tokens: 100,
         });
 
         console.log("Success! Response from model:");
