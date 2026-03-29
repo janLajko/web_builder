@@ -1,5 +1,4 @@
-import { deepseekClient } from './configs/openai.js';
-import openai from './configs/openai.js';
+import openai, { getAIModels } from './configs/openai.js';
 
 const SYSTEM_PROMPT = `You are an expert web developer AI. Output ONLY valid, clean HTML5. 
 You MUST include the Tailwind CSS CDN (<script src="https://cdn.tailwindcss.com"></script>) in the <head> for styling.
@@ -9,14 +8,12 @@ Implement beautiful, modern UI with glassmorphism, soft gradients, smooth animat
 Do NOT wrap your response in markdown tags (e.g., \`\`\`html) - output only the raw HTML code.`;
 
 async function testAI() {
-    const model = "meta/llama-3.1-70b-instruct";
+    const model = getAIModels()[0];
 
     console.log(`Testing with model: ${model}`);
 
-    const client = model.includes('deepseek') ? deepseekClient : openai;
-
     try {
-        const completion = await client.chat.completions.create({
+        const completion = await openai.chat.completions.create({
             model,
             messages: [
                 { role: "system", content: SYSTEM_PROMPT },

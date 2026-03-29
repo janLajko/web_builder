@@ -4,7 +4,6 @@ import DashboardLayout from "../components/DashboardLayout"
 import toast from "react-hot-toast"
 import { motion, AnimatePresence } from "framer-motion"
 import { Loader2, Sparkles } from "lucide-react"
-import loopVideo from "../assets/Glowing_digital_globe_202603231856.mp4"
 
 export default function AIBuilder() {
     const [input, setInput] = useState('')
@@ -60,16 +59,24 @@ export default function AIBuilder() {
                 {/* Subtle Radial Glow Behind Hero */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-[100px] pointer-events-none -z-10 animate-[pulse_6s_infinite]"></div>
 
-                {/* Looping Video Background */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-[600px] h-[600px] md:w-[800px] md:h-[800px] pointer-events-none -z-10 flex items-center justify-center mix-blend-screen opacity-70">
-                    <video 
-                        src={loopVideo} 
-                        autoPlay 
-                        loop 
-                        muted 
-                        playsInline
-                        className="w-full h-full object-contain [mask-image:radial-gradient(circle,black_40%,transparent_70%)]"
+                {/* Animated ambient background */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-[600px] h-[600px] md:w-[800px] md:h-[800px] pointer-events-none -z-10 flex items-center justify-center opacity-70">
+                    <motion.div
+                        className="absolute h-[72%] w-[72%] rounded-full border border-cyan-400/25"
+                        animate={{ rotate: 360, scale: [1, 1.04, 1] }}
+                        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
                     />
+                    <motion.div
+                        className="absolute h-[52%] w-[52%] rounded-full border border-blue-500/30"
+                        animate={{ rotate: -360, scale: [1.02, 0.98, 1.02] }}
+                        transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+                    />
+                    <motion.div
+                        className="h-[44%] w-[44%] rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(125,211,252,0.9),rgba(59,130,246,0.28)_35%,rgba(168,85,247,0.16)_58%,transparent_72%)] blur-md"
+                        animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.06, 0.98, 1] }}
+                        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <div className="absolute h-[82%] w-[82%] rounded-full bg-[radial-gradient(circle,rgba(96,165,250,0.12)_0%,rgba(96,165,250,0.02)_45%,transparent_70%)] blur-3xl" />
                 </div>
 
                 {/* Hero / Header Text with Floating Motion */}

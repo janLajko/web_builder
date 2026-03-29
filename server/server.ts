@@ -16,11 +16,6 @@ const REQUIRED_ENV_VARS = [
     'BETTER_AUTH_URL',
 ] as const;
 
-const OPTIONAL_ENV_VARS = [
-    'AI_API_KEY',
-    'DEEPSEEK_API_KEY',
-] as const;
-
 const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
 if (missing.length > 0) {
     console.error('\n' + '='.repeat(60));
@@ -36,7 +31,9 @@ if (missing.length > 0) {
     process.exit(1);
 }
 
-const missingOptional = OPTIONAL_ENV_VARS.filter((key) => !process.env[key]);
+const missingOptional = [
+    ...(process.env.OPENAI_API_KEY || process.env.AI_API_KEY ? [] : ['OPENAI_API_KEY (or AI_API_KEY)']),
+];
 if (missingOptional.length > 0) {
     console.warn('\n⚠️  Optional env vars not set (AI generation will not work):');
     missingOptional.forEach((key) => console.warn(`   • ${key}`));

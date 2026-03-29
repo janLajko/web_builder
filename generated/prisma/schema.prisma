@@ -1,24 +1,25 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../../generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../../generated/prisma"
+  binaryTargets = ["native"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id            String    @id @default(uuid())
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  emailVerified  Boolean          @default(false)
+  image          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  sessions       Session[]
+  accounts       Account[]
   // Custom fields
   credits        Int              @default(50)
   totalCreations Int              @default(0)
@@ -40,6 +41,7 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("session")
 }
 
@@ -59,6 +61,7 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  @@index([userId])
   @@map("account")
 }
 
@@ -70,24 +73,24 @@ model Verification {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  @@index([identifier])
   @@map("verification")
 }
 
 model WebsiteProject {
-  id                  String   @id @default(uuid())
+  id                  String         @id @default(uuid())
   userId              String
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   name                String
   description         String?
   initialPrompt       String?
-  currentCode         String?  @db.Text
+  currentCode         String?        @db.Text
   currentVersionIndex String?
-  isPublic            Boolean  @default(false)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  versions      Version[]
-  conversations Conversation[]
+  isPublic            Boolean        @default(false)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  versions            Version[]
+  conversations       Conversation[]
 }
 
 model Version {

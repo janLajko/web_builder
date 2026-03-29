@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
-import openai from "../configs/openai.js";
-import { deepseekClient } from "../configs/openai.js";
+import openai, { getAIModels } from "../configs/openai.js";
 
 const SYSTEM_PROMPT = `You are an elite web developer. Generate a PRODUCTION-READY static website with a STUNNING design.
 
@@ -16,72 +15,81 @@ RULES:
 8. BE CONCISE. Ensure every <file> tag is closed. NO conversational text.`;
 
 // List of models to try in order — if the first fails (rate limit/timeout), try the next
-const MODELS = [
-    process.env.PRIMARY_AI_MODEL || "qwen/qwen2.5-coder-32b-instruct",
-    process.env.SECONDARY_AI_MODEL || "qwen/qwen2.5-coder-32b-instruct",
-    process.env.TERTIARY_AI_MODEL || "qwen/qwen2.5-coder-32b-instruct"
-];
+const MODELS = getAIModels();
 
-const TIMEOUT_MS = 900000; // 15 minutes timeout
+const TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || 900000); // 15 minutes default
+const MAX_RETRIES_PER_MODEL = Math.max(1, Number(process.env.AI_MAX_RETRIES_PER_MODEL || 3));
+const RETRY_BASE_DELAY_MS = Math.max(250, Number(process.env.AI_RETRY_BASE_DELAY_MS || 1500));
+const RETRYABLE_NETWORK_CODES = new Set(["ENOTFOUND", "ECONNRESET", "ETIMEDOUT", "ECONNREFUSED", "EAI_AGAIN"]);
+
+function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 async function callAIWithFallback(messages: Array<{ role: string; content: string }>): Promise<string> {
     let lastError: any = null;
 
     for (const model of MODELS) {
-        try {
-            console.log(`[AI] Trying model: ${model}`);
+        for (let attempt = 1; attempt <= MAX_RETRIES_PER_MODEL; attempt++) {
+            try {
+                console.log(`[AI] Trying model: ${model} (attempt ${attempt}/${MAX_RETRIES_PER_MODEL})`);
 
-            // Pick the right client based on model
-            const client = model.includes('deepseek') ? deepseekClient : openai;
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+                const completion = await openai.chat.completions.create(
+                    {
+                        model,
+                        messages: messages as any,
+                        temperature: 0.2,
+                        top_p: 0.7,
+                        max_tokens: 200000,
+                    },
+                    { signal: controller.signal as any }
+                );
+                        
+                clearTimeout(timeout);
 
-            const isDeepSeek = model.toLowerCase().includes('deepseek');
-            const completion = await client.chat.completions.create(
-                {
-                    model,
-                    messages: messages as any,
-                    temperature: 0.2,
-                    top_p: 0.7,
-                    max_tokens: 8192,
-                    ...(isDeepSeek && { 
-                        extra_body: { 
-                            chat_template_kwargs: { thinking: true } 
-                        } 
-                    }) as any,
-                },
-                { signal: controller.signal as any }
-            );
-                    
-            clearTimeout(timeout);
+                const code = completion.choices?.[0]?.message?.content || "";
+                if (!code.trim()) {
+                    console.log(`[AI] Model ${model} returned empty response, trying next...`);
+                    break;
+                }
 
-            const code = completion.choices?.[0]?.message?.content || "";
-            if (!code.trim()) {
-                console.log(`[AI] Model ${model} returned empty response, trying next...`);
-                continue;
+                console.log(`[AI] Success with model: ${model} (${code.length} chars)`);
+                return code;
+            } catch (error: any) {
+                lastError = error;
+                const status = error?.status || error?.response?.status;
+                const msg = error?.message || "Unknown error";
+                const networkCode = error?.cause?.code || error?.code;
+                const networkMsg = error?.cause?.message;
+                const isRetryable =
+                    status === 429 ||
+                    status >= 500 ||
+                    error.name === "AbortError" ||
+                    RETRYABLE_NETWORK_CODES.has(networkCode);
+
+                console.error(
+                    `[AI] Model ${model} failed: ${status || "N/A"} - ${msg}` +
+                    (networkCode ? ` | ${networkCode}` : "") +
+                    (networkMsg ? ` | ${networkMsg}` : "")
+                );
+
+                if (error.name === "AbortError" || msg.includes("aborted")) {
+                    console.error(`[AI] Model ${model} timed out after ${TIMEOUT_MS / 1000}s`);
+                }
+
+                if (!isRetryable) {
+                    throw error;
+                }
+
+                if (attempt < MAX_RETRIES_PER_MODEL) {
+                    const delayMs = RETRY_BASE_DELAY_MS * attempt;
+                    console.log(`[AI] Retrying model ${model} in ${delayMs}ms...`);
+                    await sleep(delayMs);
+                }
             }
-
-            console.log(`[AI] Success with model: ${model} (${code.length} chars)`);
-            return code;
-        } catch (error: any) {
-            lastError = error;
-            const status = error?.status || error?.response?.status;
-            const msg = error?.message || "Unknown error";
-            console.error(`[AI] Model ${model} failed: ${status || "N/A"} - ${msg}`);
-
-            // If aborted due to timeout
-            if (error.name === "AbortError" || msg.includes("aborted")) {
-                console.error(`[AI] Model ${model} timed out after ${TIMEOUT_MS / 1000}s`);
-            }
-
-            // Rate limit (429) or server error (5xx) — try next model
-            if (status === 429 || status >= 500 || error.name === "AbortError") {
-                continue;
-            }
-
-            // For other errors (auth, bad request), don't retry
-            throw error;
         }
     }
 
@@ -103,49 +111,63 @@ async function streamAIWithFallback(
     let lastError: any = null;
 
     for (const model of MODELS) {
-        try {
-            console.log(`[AI-Stream] Trying model: ${model}`);
-            const client = model.toLowerCase().includes('deepseek') ? deepseekClient : openai;
-            const isDeepSeek = model.toLowerCase().includes('deepseek');
-            
-            const stream = await client.chat.completions.create({
-                model,
-                messages: messages as any,
-                temperature: 0.2,
-                top_p: 0.7,
-                max_tokens: 8192,
-                stream: true,
-                ...(isDeepSeek && { 
-                    extra_body: { 
-                        chat_template_kwargs: { thinking: true } 
-                    } 
-                }) as any,
-            }) as any;
+        for (let attempt = 1; attempt <= MAX_RETRIES_PER_MODEL; attempt++) {
+            try {
+                console.log(`[AI-Stream] Trying model: ${model} (attempt ${attempt}/${MAX_RETRIES_PER_MODEL})`);
+                
+                const stream = await openai.chat.completions.create({
+                    model,
+                    messages: messages as any,
+                    temperature: 0.2,
+                    top_p: 0.7,
+                    max_tokens: 200000,
+                    stream: true,
+                }) as any;
 
-            let fullCode = "";
-            res.setHeader('Content-Type', 'text/event-stream');
-            res.setHeader('Cache-Control', 'no-cache');
-            res.setHeader('Connection', 'keep-alive');
-            res.flushHeaders();
+                let fullCode = "";
+                res.setHeader('Content-Type', 'text/event-stream');
+                res.setHeader('Cache-Control', 'no-cache');
+                res.setHeader('Connection', 'keep-alive');
+                res.flushHeaders();
 
-            for await (const chunk of stream) {
-                const content = chunk.choices[0]?.delta?.content || "";
-                if (content) {
-                    fullCode += content;
-                    res.write(`data: ${JSON.stringify({ content })}\n\n`);
+                for await (const chunk of stream) {
+                    const content = chunk.choices[0]?.delta?.content || "";
+                    if (content) {
+                        fullCode += content;
+                        res.write(`data: ${JSON.stringify({ content })}\n\n`);
+                    }
+                }
+
+                res.write(`data: [DONE]\n\n`);
+                res.end();
+
+                await onSuccess(fullCode);
+                return;
+            } catch (error: any) {
+                lastError = error;
+                const networkCode = error?.cause?.code || error?.code;
+                const networkMsg = error?.cause?.message;
+                const isRetryable =
+                    error.status === 429 ||
+                    error.status >= 500 ||
+                    RETRYABLE_NETWORK_CODES.has(networkCode);
+
+                console.error(
+                    `[AI-Stream] Model ${model} failed: ${error?.message || "Unknown error"}` +
+                    (networkCode ? ` | ${networkCode}` : "") +
+                    (networkMsg ? ` | ${networkMsg}` : "")
+                );
+
+                if (!isRetryable) {
+                    throw error;
+                }
+
+                if (attempt < MAX_RETRIES_PER_MODEL) {
+                    const delayMs = RETRY_BASE_DELAY_MS * attempt;
+                    console.log(`[AI-Stream] Retrying model ${model} in ${delayMs}ms...`);
+                    await sleep(delayMs);
                 }
             }
-
-            res.write(`data: [DONE]\n\n`);
-            res.end();
-
-            await onSuccess(fullCode);
-            return;
-        } catch (error: any) {
-            lastError = error;
-            console.error(`[AI-Stream] Model ${model} failed:`, error.message);
-            if (error.status === 429 || error.status >= 500) continue;
-            throw error;
         }
     }
     throw lastError || new Error("All AI models failed");

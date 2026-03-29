@@ -1,32 +1,28 @@
 const OpenAI = require('openai');
 const dotenv = require('dotenv');
-const path = require('path');
 
-// Load .env from the current directory (server)
 dotenv.config();
 
-async function testQwen() {
-  // Use the specific Qwen model from the user's snippet
-  const model = "qwen/qwen2.5-coder-32b-instruct";
-  const apiKey = process.env.AI_API_KEY; // This should be the new key
+async function testOpenAI() {
+  const model = process.env.PRIMARY_AI_MODEL || 'gpt-4o-mini';
+  const apiKey = process.env.OPENAI_API_KEY || process.env.AI_API_KEY;
   
-  console.log("Testing Qwen API with model:", model);
+  console.log("Testing OpenAI API with model:", model);
   console.log("Using API Key:", apiKey ? (apiKey.substring(0, 10) + "...") : "MISSING");
 
   if (!apiKey) {
-    console.error("Error: AI_API_KEY is not set in .env");
+    console.error("Error: OPENAI_API_KEY or AI_API_KEY is not set in .env");
     process.exit(1);
   }
 
   const client = new OpenAI({
-    apiKey: apiKey,
-    baseURL: 'https://integrate.api.nvidia.com/v1',
+    apiKey,
   });
 
   try {
     const completion = await client.chat.completions.create({
-      model: model,
-      messages: [{ role: "user", content: "Say 'Qwen is working!'" }],
+      model,
+      messages: [{ role: "user", content: "Say 'OpenAI is working!'" }],
       temperature: 0.2,
       top_p: 0.7,
       max_tokens: 100
@@ -48,4 +44,4 @@ async function testQwen() {
   }
 }
 
-testQwen();
+testOpenAI();

@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { deepseekClient } from './configs/openai.js';
-import openai from './configs/openai.js';
+import openai, { getAIModels } from './configs/openai.js';
 
 const prisma = new PrismaClient();
 const SYSTEM_PROMPT = `You are an expert web developer AI. Output ONLY valid, clean HTML5. 
@@ -18,10 +17,9 @@ async function regenerate() {
     if (!project) return;
     console.log(`Regenerating project: ${project.id}`);
 
-    const model = "meta/llama-3.1-70b-instruct";
-    const client = openai;
+    const model = getAIModels()[0];
 
-    const completion = await client.chat.completions.create({
+    const completion = await openai.chat.completions.create({
         model,
         messages: [
             { role: "system", content: SYSTEM_PROMPT },
