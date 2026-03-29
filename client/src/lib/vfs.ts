@@ -8,38 +8,15 @@ export interface VFS {
 
 export function parseVFS(output: string): VFS {
   const vfs: VFS = {};
-  
-  // Split by <file path=" to find all starts
-  const fileParts = output.split(/<file path="/gi);
-  
-  // First part is usually conversational text before the first tag
-  // Subsequent parts start with the path name
-  for (let i = 1; i < fileParts.length; i++) {
-    const part = fileParts[i];
-    const pathEndIndex = part.indexOf('">');
-    if (pathEndIndex === -1) continue;
-    
-    const rawPath = part.substring(0, pathEndIndex);
+
+  const fileRegex = /<file\s+(?:path|name)="([^"]+)">([\s\S]*?)<\/file>/gi;
+  let match: RegExpExecArray | null;
+
+  while ((match = fileRegex.exec(output)) !== null) {
+    const rawPath = match[1];
     const normalizedPath = rawPath.startsWith('/') ? rawPath.slice(1) : rawPath;
-    
-    let content = part.substring(pathEndIndex + 2);
-    
-    // Check if tag is closed, if so, strip the closing tag and anything after
-    const tagEndIndex = content.toLowerCase().indexOf('</file>');
-    if (tagEndIndex !== -1) {
-      content = content.substring(0, tagEndIndex);
-    }
-    
-    // Clean up content (remove backticks if AI added them)
-    let cleanContent = content.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
-    
-    // If tag is not closed, the last part might be malformed (truncated)
-    if (tagEndIndex === -1) {
-      // Very basic fix: if the last char is < or partly written tag, try to strip it
-      // or at least ensure it doesn't end in an open bracket if possible.
-      // Better yet: if it ends in something like </h2, strip the partial tag.
-      cleanContent = cleanContent.replace(/<[^>]*$/g, ''); 
-    }
+    const content = match[2];
+    const cleanContent = content.trim().replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
 
     vfs[normalizedPath] = cleanContent;
   }
