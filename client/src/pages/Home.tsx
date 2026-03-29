@@ -375,7 +375,7 @@ export default function Home() {
                             </div>
                             <div className="flex-1 mx-8">
                                 <div className="w-full h-6 bg-white dark:bg-[#222] rounded-md border border-gray-200 dark:border-white/10 flex items-center justify-center transition-colors">
-                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">localhost:3000/preview</span>
+                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 font-mono">localhost:5678/preview</span>
                                 </div>
                             </div>
                         </div>

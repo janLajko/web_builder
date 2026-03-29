@@ -129,7 +129,7 @@ export default function Projects() {
         setStreamingCode("")
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/project/revise`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5678'}/api/project/revise`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

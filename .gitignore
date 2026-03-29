@@ -40,6 +40,7 @@ server/prisma/*.db-journal
 
 # Generated files
 generated/
+server/generated/
 
 # Temporary files
 tmp/

@@ -39,6 +39,8 @@ if (missingOptional.length > 0) {
     console.warn('   Copy values from server/.env.example\n');
 }
 
+const PORT = Number(process.env.PORT || 5678);
+
 async function startServer() {
     const app = express();
     const [{ toNodeHandler }, auth] = await Promise.all([
@@ -77,8 +79,8 @@ async function startServer() {
     app.use('/api/user', userRouter);
     app.use('/api/project', projectRouter);
 
-    app.listen(3000, () => {
-        console.log('Server is running at localhost:3000');
+    app.listen(PORT, () => {
+        console.log(`Server is running at localhost:${PORT}`);
     });
 }
 
