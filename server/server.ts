@@ -1,8 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { auth } from './lib/auth';
-import { toNodeHandler } from 'better-auth/node';
+import { getAuth } from './lib/auth';
 import userRouter from './routes/userRoutes';
 import projectRouter from './routes/projectRoutes';
 
@@ -40,39 +39,50 @@ if (missingOptional.length > 0) {
     console.warn('   Copy values from server/.env.example\n');
 }
 
-const app = express();
+async function startServer() {
+    const app = express();
+    const [{ toNodeHandler }, auth] = await Promise.all([
+        import('better-auth/node'),
+        getAuth(),
+    ]);
 
-const trustedOrigins = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    ...(process.env.TRUSTED_ORIGINS?.split(',').map(o => o.replace(/['"]/g, '').trim()) || [])
-];
+    const trustedOrigins = [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        ...(process.env.TRUSTED_ORIGINS?.split(',').map(o => o.replace(/['"]/g, '').trim()) || [])
+    ];
 
-const corsOptions = {
-    origin: function (origin: any, callback: any) {
-        if (!origin || trustedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token']
-};
-app.use(cors(corsOptions));
+    const corsOptions = {
+        origin: function (origin: any, callback: any) {
+            if (!origin || trustedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token']
+    };
+    app.use(cors(corsOptions));
 
-app.get('/', (req, res) => {
-    res.json({ message: 'DivStack AI Backend is running successfully!' });
-});
+    app.get('/', (req, res) => {
+        res.json({ message: 'DivStack AI Backend is running successfully!' });
+    });
 
-app.all('/api/auth/*', toNodeHandler(auth));
+    app.all('/api/auth/*', toNodeHandler(auth));
 
-app.use(express.json({ limit: '50mb' }));
+    app.use(express.json({ limit: '50mb' }));
 
-app.use('/api/user', userRouter);
-app.use('/api/project', projectRouter);
+    app.use('/api/user', userRouter);
+    app.use('/api/project', projectRouter);
 
-app.listen(3000, () => {
-    console.log('Server is running at localhost:3000');
+    app.listen(3000, () => {
+        console.log('Server is running at localhost:3000');
+    });
+}
+
+startServer().catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
 });
