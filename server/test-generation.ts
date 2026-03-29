@@ -21,7 +21,7 @@ async function testAI() {
             ],
             temperature: 0.2,
             top_p: 0.7,
-            max_tokens: 8192,
+            max_completion_tokens: 8192,
         });
 
         const code = completion.choices?.[0]?.message?.content || "";

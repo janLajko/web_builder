@@ -25,7 +25,7 @@ async function testOpenAI() {
       messages: [{ role: "user", content: "Say 'OpenAI is working!'" }],
       temperature: 0.2,
       top_p: 0.7,
-      max_tokens: 100
+      max_completion_tokens: 100
     });
 
     console.log("\n--- Response ---");

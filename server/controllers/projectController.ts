@@ -20,6 +20,7 @@ const MODELS = getAIModels();
 const TIMEOUT_MS = Number(process.env.AI_REQUEST_TIMEOUT_MS || 900000); // 15 minutes default
 const MAX_RETRIES_PER_MODEL = Math.max(1, Number(process.env.AI_MAX_RETRIES_PER_MODEL || 3));
 const RETRY_BASE_DELAY_MS = Math.max(250, Number(process.env.AI_RETRY_BASE_DELAY_MS || 1500));
+const MAX_COMPLETION_TOKENS = Number(process.env.AI_MAX_COMPLETION_TOKENS || 32768);
 const RETRYABLE_NETWORK_CODES = new Set(["ENOTFOUND", "ECONNRESET", "ETIMEDOUT", "ECONNREFUSED", "EAI_AGAIN"]);
 
 function sleep(ms: number) {
@@ -43,7 +44,7 @@ async function callAIWithFallback(messages: Array<{ role: string; content: strin
                         messages: messages as any,
                         temperature: 0.2,
                         top_p: 0.7,
-                        max_tokens: 200000,
+                        max_completion_tokens: MAX_COMPLETION_TOKENS,
                     },
                     { signal: controller.signal as any }
                 );
@@ -120,7 +121,7 @@ async function streamAIWithFallback(
                     messages: messages as any,
                     temperature: 0.2,
                     top_p: 0.7,
-                    max_tokens: 200000,
+                    max_completion_tokens: MAX_COMPLETION_TOKENS,
                     stream: true,
                 }) as any;
 

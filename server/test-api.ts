@@ -12,7 +12,7 @@ async function testConnection() {
             ],
             temperature: 0.2,
             top_p: 0.7,
-            max_tokens: 100,
+            max_completion_tokens: 100,
         });
 
         console.log("Success! Response from model:");
